@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import { CharacterScene } from './components/Character/CharacterScene'
 import { CharacterPicker } from './components/Character/CharacterPicker'
 import { ChatPanel } from './components/Chat/ChatPanel'
-import { SettingsPanel } from './components/Chat/SettingsPanel'
 import styles from './App.module.css'
 
 export default function App() {
-  const [showSettings, setShowSettings] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
   const [suppressHover, setSuppressHover] = useState(false)
@@ -31,7 +29,7 @@ export default function App() {
 
         <button
           className={styles.settingsBtn}
-          onClick={() => setShowSettings(true)}
+          onClick={() => window.electron.openSettings()}
           title="Settings"
         >
           ⚙
@@ -56,10 +54,6 @@ export default function App() {
         <CharacterPicker onClose={() => setShowPicker(false)} />
       )}
 
-      {/* Settings modal */}
-      {showSettings && (
-        <SettingsPanel onClose={() => setShowSettings(false)} />
-      )}
     </div>
   )
 }

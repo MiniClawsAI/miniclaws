@@ -38,10 +38,18 @@ contextBridge.exposeInMainWorld('electron', {
   minimizeWindow: () => {
     ipcRenderer.send('minimize-window')
   },
+  openSettings: () => {
+    ipcRenderer.send('open-settings')
+  },
   onSuppressHover: (cb: (suppress: boolean) => void) => {
     const handler = (_: unknown, suppress: boolean) => cb(suppress)
     ipcRenderer.on('suppress-hover', handler)
     return () => ipcRenderer.removeListener('suppress-hover', handler)
+  },
+  onToolStatus: (cb: (status: string) => void) => {
+    const handler = (_: unknown, status: string) => cb(status)
+    ipcRenderer.on('ai:tool_status', handler)
+    return () => ipcRenderer.removeListener('ai:tool_status', handler)
   }
 })
 
@@ -58,7 +66,9 @@ declare global {
       getWindowPos: () => Promise<[number, number]>
       getScreenSize: () => Promise<{ width: number; height: number }>
       minimizeWindow: () => void
+      openSettings: () => void
       onSuppressHover: (cb: (suppress: boolean) => void) => () => void
+      onToolStatus: (cb: (status: string) => void) => () => void
     }
   }
 }

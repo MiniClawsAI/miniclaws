@@ -220,6 +220,17 @@
   cursor: not-allowed;
 }
 
+.toolStatus {
+  font-style: italic;
+  color: rgba(167, 139, 250, 0.7) !important;
+  animation: fadeInOut 1.5s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
 @keyframes pulse {
   0%, 100% { box-shadow: 0 0 6px #34d399; }
   50%       { box-shadow: 0 0 12px #34d399, 0 0 4px #34d399; }

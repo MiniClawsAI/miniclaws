@@ -4,6 +4,7 @@ import { is } from '@electron-toolkit/utils'
 import { setupAIHandlers } from './ipc/ai'
 
 let mainWindow: BrowserWindow | null = null
+let settingsWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 
 function createWindow(): void {
@@ -82,6 +83,11 @@ function createWindow(): void {
     return { width, height }
   })
 
+  // IPC: open settings in separate window
+  ipcMain.on('open-settings', () => {
+    openSettingsWindow()
+  })
+
   // IPC: minimize — fade out then hide
   ipcMain.on('minimize-window', () => {
     if (!mainWindow) return
@@ -127,6 +133,46 @@ function fadeWindow(
       onDone?.()
     }
   }, stepTime)
+}
+
+function openSettingsWindow(): void {
+  if (settingsWindow && !settingsWindow.isDestroyed()) {
+    settingsWindow.focus()
+    return
+  }
+
+  settingsWindow = new BrowserWindow({
+    width: 420,
+    height: 580,
+    resizable: false,
+    frame: true,
+    transparent: false,
+    title: 'Companion Settings',
+    backgroundColor: '#16142a',
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    }
+  })
+
+  // Remove menu bar on Windows/Linux
+  settingsWindow.setMenuBarVisibility(false)
+
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    settingsWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?page=settings`)
+  } else {
+    settingsWindow.loadFile(join(__dirname, '../renderer/index.html'), {
+      query: { page: 'settings' }
+    })
+  }
+
+  settingsWindow.on('closed', () => {
+    settingsWindow = null
+    // Notify main window that settings may have changed
+    mainWindow?.webContents.send('settings-changed')
+  })
 }
 
 function createTray(): void {

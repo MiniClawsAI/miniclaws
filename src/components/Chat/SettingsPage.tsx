@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../../store'
-import styles from './SettingsPanel.module.css'
+import styles from './SettingsPage.module.css'
 
 const MODELS: Record<string, { value: string; label: string }[]> = {
   anthropic: [
@@ -29,25 +29,28 @@ function validModel(provider: string, model?: string): string {
   return list[0].value
 }
 
-export function SettingsPanel({ onClose }: { onClose: () => void }) {
+export function SettingsPage() {
   const { aiConfig, setAIConfig } = useStore()
   const [local, setLocal] = useState({
     ...aiConfig,
-    model: validModel(aiConfig.provider, aiConfig.model)
+    model: validModel(aiConfig.provider, aiConfig.model),
+    webSearchEnabled: aiConfig.webSearchEnabled ?? true
   })
+  const [saved, setSaved] = useState(false)
 
   const save = () => {
     setAIConfig(local)
-    onClose()
+    setSaved(true)
+    setTimeout(() => setSaved(false), 1500)
   }
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.panel}>
-        <div className={styles.header}>
-          <span>Settings</span>
-          <button className={styles.closeBtn} onClick={onClose}>×</button>
-        </div>
+    <div className={styles.page}>
+      <h1 className={styles.title}>Settings</h1>
+
+      {/* ── LLM Provider Section ─────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>LLM Provider</h2>
 
         <div className={styles.field}>
           <label>Provider</label>
@@ -70,7 +73,11 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <label>API Key</label>
           <input
             type="password"
-            placeholder={local.provider === 'ollama' ? 'Not needed for Ollama' : local.provider === 'gemini' ? 'AIza...' : 'sk-...'}
+            placeholder={
+              local.provider === 'ollama' ? 'Not needed for Ollama'
+              : local.provider === 'gemini' ? 'AIza...'
+              : 'sk-...'
+            }
             value={local.apiKey || ''}
             onChange={(e) => setLocal({ ...local, apiKey: e.target.value })}
             disabled={local.provider === 'ollama'}
@@ -109,18 +116,23 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             />
           </div>
         )}
+      </section>
+
+      {/* ── Web Search Section ───────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Web Search</h2>
 
         <div className={styles.field}>
           <label className={styles.toggleRow}>
-            <span>Web search</span>
+            <span>Enable web search</span>
             <input
               type="checkbox"
-              checked={local.webSearchEnabled ?? true}
+              checked={local.webSearchEnabled}
               onChange={(e) => setLocal({ ...local, webSearchEnabled: e.target.checked })}
             />
           </label>
           <span className={styles.hint}>
-            Uses free DuckDuckGo search by default. Add a Tavily key below for better results.
+            Uses free DuckDuckGo search by default
           </span>
         </div>
 
@@ -134,25 +146,32 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               onChange={(e) => setLocal({ ...local, tavilyApiKey: e.target.value })}
             />
             <span className={styles.hint}>
-              Free tier at tavily.com — 1,000 searches/month
+              Improves search quality. Free tier at tavily.com (1,000 searches/month)
             </span>
           </div>
         )}
+      </section>
+
+      {/* ── System Prompt Section ────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Behavior</h2>
 
         <div className={styles.field}>
           <label>System prompt</label>
           <textarea
-            rows={4}
+            rows={5}
             value={local.systemPrompt || ''}
             onChange={(e) => setLocal({ ...local, systemPrompt: e.target.value })}
             placeholder="Describe how the companion should behave..."
           />
         </div>
+      </section>
 
-        <div className={styles.actions}>
-          <button className={styles.cancel} onClick={onClose}>Cancel</button>
-          <button className={styles.save} onClick={save}>Save</button>
-        </div>
+      {/* ── Save Button ──────────────────────────────────── */}
+      <div className={styles.actions}>
+        <button className={styles.save} onClick={save}>
+          {saved ? '✓ Saved' : 'Save'}
+        </button>
       </div>
     </div>
   )

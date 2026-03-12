@@ -41,7 +41,9 @@ export const useStore = create<CompanionStore>()(
         apiKey: '',
         model: 'claude-haiku-4-5-20251001',
         systemPrompt:
-          "You are a friendly 3D desktop companion. Be helpful, witty, and concise — 1-3 sentences unless asked for more. You live on the user's desktop and assist them throughout the day."
+          "You are a friendly 3D desktop companion. Be helpful, witty, and concise — 1-3 sentences unless asked for more. You live on the user's desktop and assist them throughout the day.",
+        webSearchEnabled: true,
+        tavilyApiKey: ''
       },
       setAIConfig: (config) =>
         set((s) => ({ aiConfig: { ...s.aiConfig, ...config } })),

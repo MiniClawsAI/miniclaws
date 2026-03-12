@@ -23,9 +23,19 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
   } = useStore()
 
   const [input, setInput] = useState('')
+  const [toolStatus, setToolStatus] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLTextAreaElement>(null)
   const cleanups  = useRef<(() => void)[]>([])
+
+  // Listen for tool status (e.g. "Searching the web...")
+  useEffect(() => {
+    const off = window.electron.onToolStatus((status) => {
+      setToolStatus(status)
+      setEmotion('thinking')
+    })
+    return off
+  }, [setEmotion])
 
   useEffect(() => {
     if (threadOpen) {
@@ -59,12 +69,14 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       appendStreamText(chunk)
       setSpeechText(fullText)
       setEmotion('talking')
+      setToolStatus('') // clear "Searching..." once text starts
     })
 
     const offDone = window.electron.onDone(() => {
       addMessage({ role: 'assistant', content: fullText })
       clearStreamText()
       setStreaming(false)
+      setToolStatus('')
       setEmotion('happy')
       setTimeout(() => setEmotion('idle'), 2500)
       inputRef.current?.focus()
@@ -129,6 +141,13 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
               <div className={styles.bubble}>{msg.content}</div>
             </div>
           ))}
+          {toolStatus && !streamingText && (
+            <div className={`${styles.msg} ${styles.assistant}`}>
+              <div className={`${styles.bubble} ${styles.toolStatus}`}>
+                🔍 {toolStatus}
+              </div>
+            </div>
+          )}
           {streamingText && (
             <div className={`${styles.msg} ${styles.assistant}`}>
               <div className={styles.bubble}>
