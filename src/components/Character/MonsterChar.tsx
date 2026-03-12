@@ -64,7 +64,7 @@ export function MonsterChar({ emotion, isTalking, appearance }: MonsterCharProps
   const { body, bodyDark, horn, spot } = appearance
 
   return (
-    <group ref={groupRef} position={[0, -0.05, 0]}>
+    <group ref={groupRef} position={[0, -0.08, 0]}>
       {/* ── Body/Head (single round shape) ────────────── */}
       <group ref={headRef}>
         <mesh ref={bodyMesh} position={[0, 0, 0]}>

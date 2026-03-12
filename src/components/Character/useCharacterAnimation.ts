@@ -44,6 +44,7 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
   const t = useRef(0)
   const blinkT = useRef(0)
   const nextBlink = useRef(2.5 + Math.random() * 3)
+  const initialY = useRef<number | null>(null)
 
   const {
     emotion,
@@ -60,10 +61,15 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     blinkT.current += delta
     if (!refs.groupRef.current || !refs.headRef.current) return
 
+    // Capture initial Y position on first frame
+    if (initialY.current === null) {
+      initialY.current = refs.groupRef.current.position.y
+    }
+
     const time = t.current
 
-    // Subtle idle sway
-    refs.groupRef.current.position.y = Math.sin(time * 0.8) * swayAmount
+    // Subtle idle sway (additive to initial position)
+    refs.groupRef.current.position.y = initialY.current + Math.sin(time * 0.8) * swayAmount
     refs.groupRef.current.rotation.y = Math.sin(time * 0.3) * 0.08
 
     // Head look around
@@ -90,9 +96,13 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
       if (refs.eyeL?.current && refs.eyeR?.current) {
         refs.eyeL.current.scale.y = 0.08
         refs.eyeR.current.scale.y = 0.08
+        if (refs.pupilL?.current) refs.pupilL.current.scale.y = 0.08
+        if (refs.pupilR?.current) refs.pupilR.current.scale.y = 0.08
         setTimeout(() => {
           if (refs.eyeL?.current) refs.eyeL.current.scale.y = 1
           if (refs.eyeR?.current) refs.eyeR.current.scale.y = 1
+          if (refs.pupilL?.current) refs.pupilL.current.scale.y = 1
+          if (refs.pupilR?.current) refs.pupilR.current.scale.y = 1
         }, 100)
       }
     }

@@ -71,7 +71,7 @@ export function RobotChar({ emotion, isTalking, appearance }: RobotCharProps) {
   const { chassis, trim, screen, led } = appearance
 
   return (
-    <group ref={groupRef} position={[0, -0.1, 0]}>
+    <group ref={groupRef} position={[0, 0.20, 0]} scale={0.85}>
       {/* ── Head ──────────────────────────────────────── */}
       <group ref={headRef}>
         {/* Head box (rounded via segments) */}

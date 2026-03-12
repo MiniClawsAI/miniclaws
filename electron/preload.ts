@@ -34,6 +34,9 @@ contextBridge.exposeInMainWorld('electron', {
   },
   getScreenSize: (): Promise<{ width: number; height: number }> => {
     return ipcRenderer.invoke('get-screen-size')
+  },
+  minimizeWindow: () => {
+    ipcRenderer.send('minimize-window')
   }
 })
 
@@ -49,6 +52,7 @@ declare global {
       moveWindow: (x: number, y: number) => void
       getWindowPos: () => Promise<[number, number]>
       getScreenSize: () => Promise<{ width: number; height: number }>
+      minimizeWindow: () => void
     }
   }
 }

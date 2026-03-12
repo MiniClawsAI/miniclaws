@@ -46,12 +46,30 @@ export interface RobotAppearance extends CharacterBase {
   led: string
 }
 
+// ── Lobster ─────────────────────────────────────────────────
+export interface LobsterAppearance extends CharacterBase {
+  type: 'lobster'
+  shell: string
+  shellDark: string
+  claw: string
+  belly: string
+}
+
+// ── Clippy ──────────────────────────────────────────────────
+export interface ClippyAppearance extends CharacterBase {
+  type: 'clippy'
+  wire: string
+  wireDark: string
+}
+
 // ── Union type ───────────────────────────────────────────────
 export type CharacterAppearance =
   | PersonAppearance
   | MonsterAppearance
   | AnimalAppearance
   | RobotAppearance
+  | LobsterAppearance
+  | ClippyAppearance
 
 export type CharacterType = CharacterAppearance['type']
 
@@ -129,6 +147,18 @@ export const CHARACTERS: CharacterAppearance[] = [
     mouth: '#a04848', pupil: '#1a0e04', blush: '#c08868',
   },
 
+  // ── Lobsters ───────────────────────────────────────────────
+  {
+    type: 'lobster', id: 'snappy', name: 'Snappy',
+    shell: '#d44030', shellDark: '#a02820', claw: '#e85040', belly: '#f0b898',
+    mouth: '#c03030', pupil: '#1a0808', blush: '#e07060',
+  },
+  {
+    type: 'lobster', id: 'coral', name: 'Coral',
+    shell: '#e07050', shellDark: '#b84838', claw: '#f09070', belly: '#fce0c8',
+    mouth: '#d05050', pupil: '#2a1010', blush: '#f09888',
+  },
+
   // ── Robots ─────────────────────────────────────────────────
   {
     type: 'robot', id: 'sparky', name: 'Sparky',
@@ -139,6 +169,18 @@ export const CHARACTERS: CharacterAppearance[] = [
     type: 'robot', id: 'pixel', name: 'Pixel',
     chassis: '#f0e0c0', trim: '#e06040', screen: '#201820', led: '#f06080',
     mouth: '#f06080', pupil: '#ff90b0', blush: '#c0a088',
+  },
+
+  // ── Clippies ─────────────────────────────────────────────────
+  {
+    type: 'clippy', id: 'clippy', name: 'Clippy',
+    wire: '#9B99B8', wireDark: '#7A7890',
+    mouth: '#CC6666', pupil: '#1A1A2E', blush: '#B5B0D0',
+  },
+  {
+    type: 'clippy', id: 'goldy', name: 'Goldy',
+    wire: '#D4A843', wireDark: '#B08A30',
+    mouth: '#C07050', pupil: '#3A2810', blush: '#D0B878',
   },
 ]
 
@@ -160,14 +202,18 @@ export const TYPE_LABELS: Record<CharacterType, string> = {
   person: 'People',
   monster: 'Monsters',
   animal: 'Animals',
+  lobster: 'Lobsters',
   robot: 'Robots',
+  clippy: 'Clippies',
 }
 
 export const TYPE_ICONS: Record<CharacterType, string> = {
   person: '👤',
   monster: '👾',
   animal: '🐾',
+  lobster: '🦞',
   robot: '🤖',
+  clippy: '📎',
 }
 
-export const TYPE_ORDER: CharacterType[] = ['person', 'monster', 'animal', 'robot']
+export const TYPE_ORDER: CharacterType[] = ['person', 'monster', 'animal', 'lobster', 'robot', 'clippy']

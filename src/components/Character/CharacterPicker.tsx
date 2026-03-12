@@ -45,6 +45,16 @@ function MiniPreview({ char }: { char: CharacterAppearance }) {
           <div className={styles.miniNose} style={{ background: char.nose }} />
         </div>
       )
+    case 'lobster':
+      return (
+        <div className={styles.face} style={{ background: char.shell }}>
+          <div className={`${styles.miniClaw} ${styles.miniClawL}`} style={{ background: char.claw }} />
+          <div className={`${styles.miniClaw} ${styles.miniClawR}`} style={{ background: char.claw }} />
+          <div className={`${styles.eye} ${styles.eyeL}`} style={{ background: char.pupil }} />
+          <div className={`${styles.eye} ${styles.eyeR}`} style={{ background: char.pupil }} />
+          <div className={styles.smileMouth} style={{ background: char.mouth }} />
+        </div>
+      )
     case 'robot':
       return (
         <div className={`${styles.face} ${styles.faceSquare}`} style={{ background: char.chassis }}>
@@ -52,6 +62,16 @@ function MiniPreview({ char }: { char: CharacterAppearance }) {
             <div className={`${styles.eye} ${styles.eyeL} ${styles.eyeGlow}`} style={{ background: char.led }} />
             <div className={`${styles.eye} ${styles.eyeR} ${styles.eyeGlow}`} style={{ background: char.led }} />
           </div>
+        </div>
+      )
+    case 'clippy':
+      return (
+        <div className={styles.face} style={{ background: char.wire }}>
+          <div className={`${styles.miniBrow} ${styles.miniBrowL}`} style={{ background: char.pupil }} />
+          <div className={`${styles.miniBrow} ${styles.miniBrowR}`} style={{ background: char.pupil }} />
+          <div className={`${styles.eye} ${styles.eyeL} ${styles.eyeBig}`} style={{ background: char.pupil }} />
+          <div className={`${styles.eye} ${styles.eyeR} ${styles.eyeBig}`} style={{ background: char.pupil }} />
+          <div className={styles.smileMouth} style={{ background: char.mouth }} />
         </div>
       )
   }

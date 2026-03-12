@@ -1,6 +1,5 @@
-import { Suspense, useRef, useCallback, useState } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { ContactShadows } from '@react-three/drei'
+import { Suspense, useRef, useCallback, useState, useEffect } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
 import { useStore } from '../../store'
 import { getCharacter } from '../../characters'
 import { VRMAvatar } from './VRMAvatar'
@@ -8,6 +7,16 @@ import { CharacterRenderer } from './CharacterRenderer'
 import { SpeechBubble } from './SpeechBubble'
 import { ContextMenu } from '../Chat/ContextMenu'
 import styles from './CharacterScene.module.css'
+
+function CameraZoom() {
+  const { camera } = useThree()
+  useEffect(() => {
+    camera.position.z = 2.2
+    camera.position.y = 0.05
+    camera.updateProjectionMatrix()
+  }, camera)
+  return null
+}
 
 export function CharacterScene() {
   const {
@@ -86,8 +95,9 @@ export function CharacterScene() {
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0)
           }}
-          camera={{ position: [0, 0.5, 2.4], fov: 35 }}
+          camera={{ position: [0, 0.2, 2.5], fov: 35 }}
         >
+          <CameraZoom isClippy={appearance.type === 'clippy'} />
           <ambientLight intensity={1.2} />
           <directionalLight position={[2, 4, 3]} intensity={1.5} castShadow />
           <pointLight position={[-2, 2, 2]} intensity={0.5} color="#a78bfa" />
@@ -106,14 +116,7 @@ export function CharacterScene() {
                 appearance={appearance}
               />
             )}
-            <ContactShadows
-              position={[0, -1.0, 0]}
-              opacity={0.25}
-              scale={2}
-              blur={2}
-              far={1.5}
-            />
-            <hemisphereLight args={['#b1e1ff', '#b97a20', 0.6]} />
+<hemisphereLight args={['#b1e1ff', '#b97a20', 0.6]} />
           </Suspense>
         </Canvas>
       </div>

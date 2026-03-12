@@ -64,7 +64,7 @@
   gap: 10px;
   align-items: center;
   justify-content: center;
-  padding: 4px 0 2px;
+  padding: 4px 0 18px;
 }
 
 .swatch {
@@ -170,6 +170,28 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
+/* Lobster mini claws */
+.miniClaw {
+  position: absolute;
+  width: 7px;
+  height: 6px;
+  border-radius: 50% 50% 30% 30%;
+  top: 28%;
+}
+.miniClawL { left: -2px; transform: rotate(15deg); }
+.miniClawR { right: -2px; transform: rotate(-15deg); }
+
+/* Clippy mini brows */
+.miniBrow {
+  position: absolute;
+  width: 6px;
+  height: 2px;
+  border-radius: 1px;
+  top: 30%;
+}
+.miniBrowL { left: 20%; transform: rotate(-10deg); }
+.miniBrowR { right: 20%; transform: rotate(10deg); }
 
 /* Robot mini screen */
 .miniScreen {

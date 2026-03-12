@@ -77,7 +77,7 @@ export function AnimalChar({ emotion, isTalking, appearance }: AnimalCharProps) 
   const { fur, furDark, nose, pawPad, tail } = appearance
 
   return (
-    <group ref={groupRef} position={[0, -0.1, 0]}>
+    <group ref={groupRef} position={[0, 0.18, 0]}>
       {/* ── Head ──────────────────────────────────────── */}
       <group ref={headRef}>
         <mesh position={[0, 0, 0]}>

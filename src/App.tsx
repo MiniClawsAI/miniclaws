@@ -17,6 +17,14 @@ export default function App() {
         <CharacterScene />
 
         <button
+          className={styles.minimizeBtn}
+          onClick={() => window.electron.minimizeWindow()}
+          title="Minimize"
+        >
+          ─
+        </button>
+
+        <button
           className={styles.settingsBtn}
           onClick={() => setShowSettings(true)}
           title="Settings"
@@ -33,8 +41,10 @@ export default function App() {
         </button>
       </div>
 
-      {/* Chat: input always visible, thread expands */}
-      <ChatPanel threadOpen={threadOpen} onToggleThread={() => setThreadOpen(!threadOpen)} />
+      {/* Chat: visible on hover */}
+      <div className={styles.chatWrap}>
+        <ChatPanel threadOpen={threadOpen} onToggleThread={() => setThreadOpen(!threadOpen)} />
+      </div>
 
       {/* Character picker */}
       {showPicker && (

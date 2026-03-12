@@ -18,7 +18,8 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     clearStreamText,
     setEmotion,
     setSpeechText,
-    aiConfig
+    aiConfig,
+    clearMessages
   } = useStore()
 
   const [input, setInput] = useState('')
@@ -96,7 +97,22 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       <div className={`${styles.thread} ${threadOpen ? styles.threadOpen : ''}`}>
         <div className={styles.header}>
           <span className={styles.title}>✦ Companion</span>
-          <div className={styles.dot} />
+          <div className={styles.headerRight}>
+            {messages.length > 0 && (
+              <button
+                className={styles.clearBtn}
+                onClick={() => {
+                  clearMessages()
+                  setSpeechText('')
+                }}
+                title="Clear conversation"
+                disabled={isStreaming}
+              >
+                ✕
+              </button>
+            )}
+            <div className={styles.dot} />
+          </div>
         </div>
 
         <div className={styles.messages}>
@@ -127,7 +143,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
 
       {/* Input bar — always visible */}
       <div className={styles.inputBar}>
-        {hasMessages && (
+        {(hasMessages || threadOpen) && (
           <button
             className={styles.expandBtn}
             onClick={onToggleThread}

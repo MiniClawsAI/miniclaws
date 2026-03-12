@@ -35,7 +35,7 @@ export function PersonChar({ emotion, isTalking, appearance }: PersonCharProps) 
   const { skin, skinDark, hair, shirt, pants, shoe } = appearance
 
   return (
-    <group ref={groupRef} position={[0, -0.15, 0]}>
+    <group ref={groupRef} position={[0, 0.15, -0.3]} scale={0.9}>
 
       {/* ── Hair (back) ───────────────────────────────── */}
       <mesh position={[0, 0.08, -0.06]}>
