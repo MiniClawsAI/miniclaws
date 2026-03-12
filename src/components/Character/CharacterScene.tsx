@@ -2,8 +2,9 @@ import { Suspense, useRef, useCallback, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ContactShadows } from '@react-three/drei'
 import { useStore } from '../../store'
+import { getCharacter } from '../../characters'
 import { VRMAvatar } from './VRMAvatar'
-import { PlaceholderChar } from './PlaceholderChar'
+import { CharacterRenderer } from './CharacterRenderer'
 import { SpeechBubble } from './SpeechBubble'
 import { ContextMenu } from '../Chat/ContextMenu'
 import styles from './CharacterScene.module.css'
@@ -16,8 +17,11 @@ export function CharacterScene() {
     speechText,
     setSpeechText,
     setChatOpen,
-    isChatOpen
+    isChatOpen,
+    characterId
   } = useStore()
+
+  const appearance = getCharacter(characterId)
 
   // ── Dragging ───────────────────────────────────────────────
   const isDragging = useRef(false)
@@ -96,9 +100,10 @@ export function CharacterScene() {
                 isTalking={isStreaming}
               />
             ) : (
-              <PlaceholderChar
+              <CharacterRenderer
                 emotion={emotion}
                 isTalking={isStreaming}
+                appearance={appearance}
               />
             )}
             <ContactShadows

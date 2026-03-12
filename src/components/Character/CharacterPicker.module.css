@@ -1,0 +1,213 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 70px;
+}
+
+.panel {
+  background: rgba(18, 16, 32, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
+  animation: slideUp 0.2s ease-out;
+  min-width: 220px;
+}
+
+/* ── Category tabs ─────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  color: rgba(228, 224, 255, 0.5);
+}
+
+.tab:hover {
+  background: rgba(167, 139, 250, 0.1);
+}
+
+.tabActive {
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.3);
+  color: #a78bfa;
+}
+
+.tabIcon { font-size: 16px; }
+.tabLabel { font-size: 9px; white-space: nowrap; }
+
+/* ── Swatch row ────────────────────────────────────────────── */
+.swatchRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  background: transparent;
+  padding: 0;
+}
+
+.swatch:hover {
+  transform: scale(1.12);
+}
+
+.active {
+  border-color: #a78bfa;
+  box-shadow: 0 0 8px rgba(167,139,250,0.4);
+}
+
+/* ── Mini face preview ─────────────────────────────────────── */
+.face {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  position: relative;
+  overflow: visible;
+}
+
+.faceSquare {
+  border-radius: 6px;
+}
+
+.eye {
+  position: absolute;
+  width: 4px;
+  height: 5px;
+  border-radius: 50%;
+  top: 42%;
+}
+.eyeL { left: 26%; }
+.eyeR { right: 26%; }
+
+.eyeBig {
+  width: 6px;
+  height: 7px;
+  top: 38%;
+}
+
+.eyeGlow {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 3px currentColor;
+}
+
+.smileMouth {
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  border-radius: 0 0 4px 4px;
+  bottom: 26%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Monster mini horns */
+.miniHorn {
+  position: absolute;
+  width: 5px;
+  height: 7px;
+  border-radius: 2px 2px 0 0;
+  top: -3px;
+}
+.miniHornL { left: 22%; transform: rotate(-10deg); }
+.miniHornR { right: 22%; transform: rotate(10deg); }
+
+/* Animal mini ears */
+.miniEar {
+  position: absolute;
+  width: 7px;
+  height: 9px;
+  top: -5px;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.miniEarL { left: 12%; transform: rotate(-10deg); }
+.miniEarR { right: 12%; transform: rotate(10deg); }
+
+/* Animal mini nose */
+.miniNose {
+  position: absolute;
+  width: 6px;
+  height: 4px;
+  border-radius: 3px;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Robot mini screen */
+.miniScreen {
+  position: absolute;
+  inset: 5px 4px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.miniScreen .eye {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+}
+.miniScreen .eyeL { margin-right: 4px; }
+.miniScreen .eyeR { margin-left: 4px; }
+
+/* ── Name tooltip ──────────────────────────────────────────── */
+.name {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: rgba(228, 224, 255, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.swatch:hover .name {
+  opacity: 1;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}

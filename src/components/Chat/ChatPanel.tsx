@@ -37,6 +37,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     if (!text || isStreaming) return
 
     setInput('')
+    inputRef.current?.focus()
     addMessage({ role: 'user', content: text })
     setStreaming(true)
     clearStreamText()
@@ -65,6 +66,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       setStreaming(false)
       setEmotion('happy')
       setTimeout(() => setEmotion('idle'), 2500)
+      inputRef.current?.focus()
     })
 
     const offErr = window.electron.onError((err) => {
@@ -73,6 +75,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       clearStreamText()
       setStreaming(false)
       setEmotion('idle')
+      inputRef.current?.focus()
     })
 
     cleanups.current = [offChunk, offDone, offErr]

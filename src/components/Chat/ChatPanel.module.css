@@ -1,17 +1,20 @@
 .wrapper {
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
+  position: relative;
 }
 
 /* ── Expandable thread ─────────────────────────────────── */
 .thread {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
   height: 0;
   overflow: hidden;
   transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  background: rgba(18, 16, 32, 0.88);
+  background: rgba(18, 16, 32, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-radius: 20px 20px 0 0;
@@ -19,10 +22,11 @@
   border-bottom: none;
   color: #e4e0ff;
   font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
+  z-index: 10;
 }
 
 .threadOpen {
-  height: 240px;
+  height: 340px;
 }
 
 .header {

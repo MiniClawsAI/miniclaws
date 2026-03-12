@@ -28,6 +28,8 @@ interface CompanionStore {
   setSpeechText: (t: string) => void
   vrmPath: string | null
   setVrmPath: (p: string | null) => void
+  characterId: string
+  setCharacterId: (id: string) => void
 }
 
 export const useStore = create<CompanionStore>()(
@@ -63,14 +65,17 @@ export const useStore = create<CompanionStore>()(
       speechText: '',
       setSpeechText: (t) => set({ speechText: t }),
       vrmPath: null,
-      setVrmPath: (p) => set({ vrmPath: p })
+      setVrmPath: (p) => set({ vrmPath: p }),
+      characterId: 'default',
+      setCharacterId: (id) => set({ characterId: id })
     }),
     {
       name: 'companion-store',
       partialize: (s) => ({
         aiConfig: s.aiConfig,
         messages: s.messages.slice(-50), // keep last 50
-        vrmPath: s.vrmPath
+        vrmPath: s.vrmPath,
+        characterId: s.characterId
       })
     }
   )
