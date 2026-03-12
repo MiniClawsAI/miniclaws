@@ -1,0 +1,197 @@
+.wrapper {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Expandable thread ─────────────────────────────────── */
+.thread {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  background: rgba(18, 16, 32, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 20px 20px 0 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+  color: #e4e0ff;
+  font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
+}
+
+.threadOpen {
+  height: 240px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #a78bfa;
+  letter-spacing: 0.04em;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 6px #34d399;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167,139,250,0.2) transparent;
+}
+
+.empty {
+  text-align: center;
+  color: rgba(228, 224, 255, 0.3);
+  font-size: 12px;
+  padding: 24px 16px;
+  line-height: 1.6;
+}
+
+.msg {
+  display: flex;
+  max-width: 90%;
+}
+.user      { align-self: flex-end; }
+.assistant { align-self: flex-start; }
+
+.bubble {
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.user .bubble {
+  background: rgba(124, 108, 240, 0.5);
+  color: #f0eeff;
+  border-radius: 14px 14px 4px 14px;
+}
+.assistant .bubble {
+  background: rgba(255,255,255,0.07);
+  color: #e4e0ff;
+  border-radius: 14px 14px 14px 4px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.cursor {
+  display: inline-block;
+  animation: blink 0.7s ease-in-out infinite;
+  color: #a78bfa;
+  margin-left: 2px;
+}
+
+/* ── Input bar (always visible) ────────────────────────── */
+.inputBar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  align-items: flex-end;
+  background: rgba(18, 16, 32, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
+}
+
+.expandBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(200, 196, 255, 0.6);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.expandBtn:hover {
+  background: rgba(124, 108, 240, 0.3);
+  color: #a78bfa;
+}
+
+.input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #e4e0ff;
+  font-size: 13px;
+  padding: 9px 12px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.4;
+  max-height: 100px;
+  overflow-y: auto;
+  transition: border-color 0.2s;
+}
+.input:focus {
+  border-color: rgba(167,139,250,0.4);
+}
+.input::placeholder {
+  color: rgba(228, 224, 255, 0.25);
+}
+.input:disabled {
+  opacity: 0.5;
+}
+
+.send {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #7c6cf0;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+  flex-shrink: 0;
+}
+.send:hover:not(:disabled) {
+  background: #a78bfa;
+  transform: scale(1.05);
+}
+.send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 6px #34d399; }
+  50%       { box-shadow: 0 0 12px #34d399, 0 0 4px #34d399; }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
