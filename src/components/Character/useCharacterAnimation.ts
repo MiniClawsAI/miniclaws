@@ -45,6 +45,7 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
   const blinkT = useRef(0)
   const nextBlink = useRef(2.5 + Math.random() * 3)
   const initialY = useRef<number | null>(null)
+  const talkBlend = useRef(0) // smoothly blends 0→1 when talking
 
   const {
     emotion,
@@ -66,16 +67,24 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
       initialY.current = refs.groupRef.current.position.y
     }
 
+    // Smooth blend toward talking state
+    const talkTarget = isTalking ? 1 : 0
+    talkBlend.current = THREE.MathUtils.lerp(talkBlend.current, talkTarget, 0.04)
+    const tb = talkBlend.current
+
     const time = t.current
+    // Multiplier smoothly ramps 1→2 based on talk blend
+    const mult = 1 + tb * 1.0
 
-    // Subtle idle sway (additive to initial position)
-    refs.groupRef.current.position.y = initialY.current + Math.sin(time * 0.8) * swayAmount
-    refs.groupRef.current.rotation.y = Math.sin(time * 0.3) * 0.08
+    // Subtle idle sway — smoothly amplified when talking
+    refs.groupRef.current.position.y = initialY.current + Math.sin(time * 0.8) * swayAmount * mult
+    refs.groupRef.current.rotation.y = Math.sin(time * 0.3) * 0.08 * mult
+    refs.groupRef.current.position.x = Math.sin(time * 1.2) * 0.01 * tb
 
-    // Head look around
-    refs.headRef.current.rotation.y = Math.sin(time * 0.5) * headLookAmount
-    refs.headRef.current.rotation.z = Math.sin(time * 0.35) * 0.04
-    refs.headRef.current.rotation.x = Math.sin(time * 0.45) * 0.03
+    // Head look around — smoothly more active when talking
+    refs.headRef.current.rotation.y = Math.sin(time * 0.5) * headLookAmount * mult
+    refs.headRef.current.rotation.z = Math.sin(time * 0.35) * 0.04 * mult
+    refs.headRef.current.rotation.x = Math.sin(time * 0.45) * 0.03 * mult
 
     // Pupil tracking
     const px = Math.sin(time * 0.6) * 0.008
@@ -135,26 +144,28 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
       }
     }
 
-    // Arm swing
+    // Arm swing — smoothly gesture more when talking
+    const armSwing = 0.04 + tb * 0.08
     if (refs.armL?.current) {
-      refs.armL.current.rotation.z = 0.15 + Math.sin(time * 0.9) * 0.04
-      if (emotion === 'wave') refs.armL.current.rotation.z = 0.15
+      refs.armL.current.rotation.z = -0.3 + Math.sin(time * 0.9) * armSwing
+      if (emotion === 'wave') refs.armL.current.rotation.z = -0.3
     }
     if (refs.armR?.current) {
       if (emotion === 'wave') {
         refs.armR.current.rotation.z = -0.8 - Math.sin(time * 4) * 0.3
       } else {
-        refs.armR.current.rotation.z = -0.15 + Math.sin(time * 0.9 + 1) * 0.04
+        refs.armR.current.rotation.z = 0.3 + Math.sin(time * 0.9 + 1) * armSwing
       }
     }
+    const forearmSwing = 0.05 + tb * 0.1
     if (refs.forearmL?.current) {
-      refs.forearmL.current.rotation.z = Math.sin(time * 0.7) * 0.05
+      refs.forearmL.current.rotation.z = Math.sin(time * 0.7) * forearmSwing
     }
     if (refs.forearmR?.current) {
       if (emotion === 'wave') {
         refs.forearmR.current.rotation.z = -0.6 - Math.sin(time * 6) * 0.4
       } else {
-        refs.forearmR.current.rotation.z = Math.sin(time * 0.7 + 1) * 0.05
+        refs.forearmR.current.rotation.z = Math.sin(time * 0.7 + 1) * forearmSwing
       }
     }
 

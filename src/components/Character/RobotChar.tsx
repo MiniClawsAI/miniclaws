@@ -71,7 +71,7 @@ export function RobotChar({ emotion, isTalking, appearance }: RobotCharProps) {
   const { chassis, trim, screen, led } = appearance
 
   return (
-    <group ref={groupRef} position={[0, 0.20, 0]} scale={0.85}>
+    <group ref={groupRef} position={[0, 0.20, 0]} scale={0.8}>
       {/* ── Head ──────────────────────────────────────── */}
       <group ref={headRef}>
         {/* Head box (rounded via segments) */}
@@ -134,12 +134,12 @@ export function RobotChar({ emotion, isTalking, appearance }: RobotCharProps) {
       </group>
 
       {/* ── Neck ──────────────────────────────────────── */}
-      <mesh position={[0, -0.16, 0]}>
-        <cylinderGeometry args={[0.04, 0.05, 0.06, 8]} />
+      <mesh position={[0, -0.17, 0]}>
+        <cylinderGeometry args={[0.04, 0.05, 0.1, 8]} />
         <meshStandardMaterial color={trim} roughness={0.3} metalness={0.5} />
       </mesh>
       {/* Neck ring */}
-      <mesh position={[0, -0.16, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -0.17, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.05, 0.008, 8, 16]} />
         <meshStandardMaterial color={trim} roughness={0.3} metalness={0.5} />
       </mesh>

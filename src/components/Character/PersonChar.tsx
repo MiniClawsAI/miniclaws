@@ -35,7 +35,7 @@ export function PersonChar({ emotion, isTalking, appearance }: PersonCharProps) 
   const { skin, skinDark, hair, shirt, pants, shoe } = appearance
 
   return (
-    <group ref={groupRef} position={[0, 0.15, -0.3]} scale={0.9}>
+    <group ref={groupRef} position={[0, 0.15, -0.3]} scale={0.8}>
 
       {/* ── Hair (back) ───────────────────────────────── */}
       <mesh position={[0, 0.08, -0.06]}>
@@ -158,7 +158,7 @@ export function PersonChar({ emotion, isTalking, appearance }: PersonCharProps) 
 
       {/* ── Arms ──────────────────────────────────────── */}
       {/* Left arm */}
-      <group ref={armL} position={[-0.2, -0.36, 0]}>
+      <group ref={armL} position={[-0.18, -0.34, 0]}>
         <mesh position={[0, -0.08, 0]}>
           <capsuleGeometry args={[0.04, 0.14, 4, 8]} />
           <meshStandardMaterial color={shirt} roughness={0.5} />
@@ -177,7 +177,7 @@ export function PersonChar({ emotion, isTalking, appearance }: PersonCharProps) 
       </group>
 
       {/* Right arm */}
-      <group ref={armR} position={[0.2, -0.36, 0]}>
+      <group ref={armR} position={[0.18, -0.34, 0]}>
         <mesh position={[0, -0.08, 0]}>
           <capsuleGeometry args={[0.04, 0.14, 4, 8]} />
           <meshStandardMaterial color={shirt} roughness={0.5} />

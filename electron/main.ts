@@ -82,17 +82,51 @@ function createWindow(): void {
     return { width, height }
   })
 
-  // IPC: minimize — make invisible instantly, then hide (no genie effect)
+  // IPC: minimize — fade out then hide
   ipcMain.on('minimize-window', () => {
     if (!mainWindow) return
-    // Make transparent first so there's nothing to animate
-    mainWindow.setOpacity(0)
-    mainWindow.hide()
-    // Show dock icon so user can click to restore
-    if (process.platform === 'darwin') {
-      app.dock?.show()
-    }
+    fadeWindow(mainWindow, 1, 0, 250, () => {
+      mainWindow?.hide()
+      if (process.platform === 'darwin') app.dock?.show()
+    })
   })
+}
+
+function restoreWindow(): void {
+  if (!mainWindow) return
+  mainWindow.setOpacity(0)
+  mainWindow.webContents.send('suppress-hover', true)
+  mainWindow.show()
+  if (process.platform === 'darwin') app.dock?.hide()
+  fadeWindow(mainWindow, 0, 1, 250, () => {
+    mainWindow?.webContents.send('suppress-hover', false)
+  })
+}
+
+// Smooth fade helper — steps opacity from→to over duration ms
+function fadeWindow(
+  win: BrowserWindow,
+  from: number,
+  to: number,
+  duration: number,
+  onDone?: () => void
+): void {
+  const steps = 15
+  const stepTime = duration / steps
+  const delta = (to - from) / steps
+  let current = from
+  let step = 0
+
+  const interval = setInterval(() => {
+    step++
+    current += delta
+    win.setOpacity(Math.max(0, Math.min(1, current)))
+    if (step >= steps) {
+      clearInterval(interval)
+      win.setOpacity(to)
+      onDone?.()
+    }
+  }, stepTime)
 }
 
 function createTray(): void {
@@ -122,12 +156,7 @@ function createTray(): void {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Show Companion',
-      click: () => {
-        if (!mainWindow) return
-        mainWindow.show()
-        mainWindow.setOpacity(1)
-        if (process.platform === 'darwin') app.dock?.hide()
-      }
+      click: () => restoreWindow()
     },
     { type: 'separator' },
     {
@@ -140,12 +169,7 @@ function createTray(): void {
   tray.setContextMenu(contextMenu)
 
   // Click tray icon to restore window
-  tray.on('click', () => {
-    if (!mainWindow) return
-    mainWindow.show()
-    mainWindow.setOpacity(1)
-    if (process.platform === 'darwin') app.dock?.hide()
-  })
+  tray.on('click', () => restoreWindow())
 }
 
 app.whenReady().then(() => {
@@ -155,9 +179,7 @@ app.whenReady().then(() => {
 
   app.on('activate', () => {
     if (mainWindow && !mainWindow.isVisible()) {
-      mainWindow.show()
-      mainWindow.setOpacity(1)
-      app.dock?.hide()
+      restoreWindow()
     } else if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
     }

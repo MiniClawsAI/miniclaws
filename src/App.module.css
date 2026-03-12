@@ -33,7 +33,7 @@
   opacity: 0;
   z-index: 5;
 }
-.root:hover .settingsBtn { opacity: 1; }
+.root:hover .settingsBtn { opacity: 1; transition-delay: 0.3s; }
 .settingsBtn:hover {
   background: rgba(124, 108, 240, 0.3);
   color: #a78bfa;
@@ -59,7 +59,7 @@
   opacity: 0;
   z-index: 5;
 }
-.root:hover .pickerBtn { opacity: 1; }
+.root:hover .pickerBtn { opacity: 1; transition-delay: 0.3s; }
 .pickerBtn:hover {
   background: rgba(124, 108, 240, 0.3);
   color: #a78bfa;
@@ -86,7 +86,7 @@
   opacity: 0;
   z-index: 5;
 }
-.root:hover .minimizeBtn { opacity: 1; }
+.root:hover .minimizeBtn { opacity: 1; transition-delay: 0.3s; }
 .minimizeBtn:hover {
   background: rgba(124, 108, 240, 0.3);
   color: #a78bfa;
@@ -101,5 +101,9 @@
   opacity: 0;
   transition: opacity 0.2s ease;
 }
-.root:hover .chatWrap { opacity: 1; }
+.root:hover .chatWrap { opacity: 1; transition-delay: 0.3s; }
+.suppressHover .chatWrap,
+.suppressHover .settingsBtn,
+.suppressHover .pickerBtn,
+.suppressHover .minimizeBtn { opacity: 0 !important; pointer-events: none; transition-delay: 0s; }
 

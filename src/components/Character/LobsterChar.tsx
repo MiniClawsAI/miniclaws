@@ -56,7 +56,7 @@ export function LobsterChar({ emotion, isTalking, appearance }: LobsterCharProps
   const { shell, shellDark, claw, belly } = appearance
 
   return (
-    <group ref={groupRef} position={[0, -0.17, 0]}>
+    <group ref={groupRef} position={[0, -0.17, 0]} scale={0.85}>
       {/* ── Body + Head (single round shape) ──────────── */}
       <group ref={headRef}>
         {/* Main body — one big round sphere */}

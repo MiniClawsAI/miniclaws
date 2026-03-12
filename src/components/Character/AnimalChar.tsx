@@ -77,7 +77,7 @@ export function AnimalChar({ emotion, isTalking, appearance }: AnimalCharProps) 
   const { fur, furDark, nose, pawPad, tail } = appearance
 
   return (
-    <group ref={groupRef} position={[0, 0.18, 0]}>
+    <group ref={groupRef} position={[0, 0.13, 0]} scale={0.8}>
       {/* ── Head ──────────────────────────────────────── */}
       <group ref={headRef}>
         <mesh position={[0, 0, 0]}>
@@ -155,12 +155,12 @@ export function AnimalChar({ emotion, isTalking, appearance }: AnimalCharProps) 
         {/* Whiskers */}
         {[-1, 1].map((side) => (
           <group key={side}>
-            <mesh position={[side * 0.12, -0.03, 0.24]} rotation={[0, 0, side * 0.1]}>
-              <cylinderGeometry args={[0.002, 0.002, 0.1, 4]} />
+            <mesh position={[side * 0.08, -0.02, 0.22]} rotation={[0, 0, Math.PI / 2 + side * 0.15]}>
+              <cylinderGeometry args={[0.002, 0.001, 0.12, 4]} />
               <meshStandardMaterial color={fur} roughness={0.5} />
             </mesh>
-            <mesh position={[side * 0.13, -0.05, 0.23]} rotation={[0, 0, side * 0.2]}>
-              <cylinderGeometry args={[0.002, 0.002, 0.09, 4]} />
+            <mesh position={[side * 0.08, -0.05, 0.21]} rotation={[0, 0, Math.PI / 2 + side * 0.25]}>
+              <cylinderGeometry args={[0.002, 0.001, 0.1, 4]} />
               <meshStandardMaterial color={fur} roughness={0.5} />
             </mesh>
           </group>

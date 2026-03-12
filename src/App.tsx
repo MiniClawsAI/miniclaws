@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CharacterScene } from './components/Character/CharacterScene'
 import { CharacterPicker } from './components/Character/CharacterPicker'
 import { ChatPanel } from './components/Chat/ChatPanel'
@@ -9,9 +9,14 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
+  const [suppressHover, setSuppressHover] = useState(false)
+
+  useEffect(() => {
+    return window.electron.onSuppressHover(setSuppressHover)
+  }, [])
 
   return (
-    <div className={styles.root}>
+    <div className={`${styles.root} ${suppressHover ? styles.suppressHover : ''}`}>
       {/* Character always visible in top portion */}
       <div className={styles.character}>
         <CharacterScene />

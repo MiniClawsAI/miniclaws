@@ -30,7 +30,11 @@
   line-height: 1.5;
   color: #2d2d3d;
   word-break: break-word;
+  max-height: 80px;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+.content::-webkit-scrollbar { display: none; }
 
 .cursor {
   display: inline-block;
