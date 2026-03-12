@@ -201,7 +201,7 @@ export function AnimalChar({ emotion, isTalking, appearance }: AnimalCharProps) 
       </group>
 
       {/* ── Arms ──────────────────────────────────────── */}
-      <group ref={armL} position={[-0.18, -0.28, 0]}>
+      <group ref={armL} position={[-0.14, -0.28, 0]}>
         <mesh position={[0, -0.06, 0]}>
           <capsuleGeometry args={[0.035, 0.1, 4, 8]} />
           <meshStandardMaterial color={fur} roughness={0.7} />
@@ -217,7 +217,7 @@ export function AnimalChar({ emotion, isTalking, appearance }: AnimalCharProps) 
           <meshStandardMaterial color={pawPad} roughness={0.5} />
         </mesh>
       </group>
-      <group ref={armR} position={[0.18, -0.28, 0]}>
+      <group ref={armR} position={[0.14, -0.28, 0]}>
         <mesh position={[0, -0.06, 0]}>
           <capsuleGeometry args={[0.035, 0.1, 4, 8]} />
           <meshStandardMaterial color={fur} roughness={0.7} />
