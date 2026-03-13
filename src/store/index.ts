@@ -53,6 +53,7 @@ export const useStore = create<CompanionStore>()(
         systemPrompt:
           "You are MiniClaws, a friendly 3D desktop companion. Be helpful, witty, and concise — 1-3 sentences unless asked for more. You live on the user's desktop and assist them throughout the day.",
         webSearchEnabled: true,
+        openAppEnabled: true,
         tavilyApiKey: ''
       },
       setAIConfig: (config) =>

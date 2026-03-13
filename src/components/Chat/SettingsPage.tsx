@@ -34,7 +34,8 @@ export function SettingsPage() {
   const [local, setLocal] = useState({
     ...aiConfig,
     model: validModel(aiConfig.provider, aiConfig.model),
-    webSearchEnabled: aiConfig.webSearchEnabled ?? true
+    webSearchEnabled: aiConfig.webSearchEnabled ?? true,
+    openAppEnabled: aiConfig.openAppEnabled ?? true
   })
   const [saved, setSaved] = useState(false)
 
@@ -122,38 +123,60 @@ export function SettingsPage() {
         )}
       </section>
 
-      {/* ── Web Search Section ───────────────────────────── */}
+      {/* ── Tools Section ─────────────────────────────────── */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Web Search</h2>
+        <h2 className={styles.sectionTitle}>Tools</h2>
 
-        <div className={styles.field}>
-          <label className={styles.toggleRow}>
-            <span>Enable web search</span>
-            <input
-              type="checkbox"
-              checked={local.webSearchEnabled}
-              onChange={(e) => setLocal({ ...local, webSearchEnabled: e.target.checked })}
-            />
-          </label>
-          <span className={styles.hint}>
-            Uses free DuckDuckGo search by default
-          </span>
+        {/* Web Search */}
+        <div className={styles.toolItem}>
+          <div className={styles.field}>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>Web Search</span>
+                <span className={styles.toolDesc}>Search the web for current information</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.webSearchEnabled}
+                onChange={(e) => setLocal({ ...local, webSearchEnabled: e.target.checked })}
+              />
+            </label>
+          </div>
+
+          {local.webSearchEnabled && (
+            <div className={styles.toolSettings}>
+              <div className={styles.field}>
+                <label>Tavily API key <span className={styles.optional}>(optional)</span></label>
+                <input
+                  type="password"
+                  placeholder="tvly-... (leave blank for free DuckDuckGo search)"
+                  value={local.tavilyApiKey || ''}
+                  onChange={(e) => setLocal({ ...local, tavilyApiKey: e.target.value })}
+                />
+                <span className={styles.hint}>
+                  Improves search quality. Free tier at tavily.com (1,000 searches/month)
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {local.webSearchEnabled && (
+        {/* Open App */}
+        <div className={styles.toolItem}>
           <div className={styles.field}>
-            <label>Tavily API key <span className={styles.optional}>(optional)</span></label>
-            <input
-              type="password"
-              placeholder="tvly-... (leave blank for free search)"
-              value={local.tavilyApiKey || ''}
-              onChange={(e) => setLocal({ ...local, tavilyApiKey: e.target.value })}
-            />
-            <span className={styles.hint}>
-              Improves search quality. Free tier at tavily.com (1,000 searches/month)
-            </span>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>Open App</span>
+                <span className={styles.toolDesc}>Launch applications on your computer</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.openAppEnabled}
+                onChange={(e) => setLocal({ ...local, openAppEnabled: e.target.checked })}
+              />
+            </label>
           </div>
-        )}
+        </div>
       </section>
 
       {/* ── System Prompt Section ────────────────────────── */}

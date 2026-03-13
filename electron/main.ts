@@ -2,6 +2,9 @@ import { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, nativeImage } f
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { setupAIHandlers } from './ipc/ai'
+import { initToolRegistry } from './ipc/tool-registry'
+import { webSearchTool } from './ipc/tools/web-search.tool'
+import { openAppTool } from './ipc/tools/open-app.tool'
 
 let mainWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
@@ -205,6 +208,11 @@ function createTray(): void {
 }
 
 app.whenReady().then(() => {
+  // Initialize tool registry and register built-in tools
+  const registry = initToolRegistry()
+  registry.register(webSearchTool)
+  registry.register(openAppTool)
+
   setupAIHandlers()
   createWindow()
   createTray()

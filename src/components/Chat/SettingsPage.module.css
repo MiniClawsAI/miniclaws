@@ -108,6 +108,34 @@
   transform: scale(1.6);
 }
 
+/* ── Tool items ──────────────────────────────────────── */
+.toolItem {
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.toolItem .field { margin-bottom: 0; }
+.toolName {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #e4e0ff;
+}
+.toolDesc {
+  display: block;
+  font-size: 11px;
+  color: rgba(228, 224, 255, 0.35);
+  margin-top: 2px;
+}
+.toolSettings {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.toolSettings .field { margin-bottom: 8px; }
+
 /* ── Hint ─────────────────────────────────────────────── */
 .hint {
   display: block;

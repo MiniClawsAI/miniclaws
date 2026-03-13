@@ -17,19 +17,6 @@ export interface ToolCall {
   arguments: Record<string, unknown>
 }
 
-export const WEB_SEARCH_TOOL: ToolDefinition = {
-  name: 'web_search',
-  description:
-    'Search the web for current information. Use when asked about recent events, current news, facts you are unsure about, or anything requiring up-to-date information.',
-  parameters: {
-    type: 'object',
-    properties: {
-      query: { type: 'string', description: 'The search query' }
-    },
-    required: ['query']
-  }
-}
-
 // ── Format tool for each provider's API ──────────────────────
 export function formatToolsForProvider(
   tools: ToolDefinition[],

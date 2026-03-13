@@ -1,9 +1,8 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import https from 'https'
 import http from 'http'
-import { webSearch, SearchError } from './search'
+import { getToolRegistry } from './tool-registry'
 import {
-  WEB_SEARCH_TOOL,
   formatToolsForProvider,
   formatToolResultMessage,
   formatAssistantToolCallMessage,
@@ -19,6 +18,7 @@ export interface AIConfig {
   baseUrl?: string
   systemPrompt?: string
   webSearchEnabled?: boolean
+  openAppEnabled?: boolean
   tavilyApiKey?: string
 }
 
@@ -31,12 +31,42 @@ const DEFAULT_SYSTEM = `You are MiniClaws, a friendly 3D desktop companion chara
 You're helpful, witty, and concise. You live on the user's desktop and assist them.
 Keep responses short and conversational - 1-3 sentences unless asked for more.`
 
-const SEARCH_ADDENDUM = `
-IMPORTANT: You have a web_search tool available. You MUST use it whenever:
+// Tool-specific system prompt hints (only appended when tool is enabled)
+const TOOL_HINTS: Record<string, string> = {
+  web_search: `
+web_search — Search the web. You MUST use it whenever:
 - The user asks about current events, news, weather, or real-time information
 - The user asks about something you're not confident about
 - The user asks for recent data, prices, scores, or status updates
-Do NOT make up or guess at current information — always search first.`
+Do NOT make up or guess at current information — always search first.`,
+
+  open_app: `
+open_app — Open applications on the user's computer. Use it when:
+- The user asks you to open, launch, or start an app (e.g., "open Chrome", "launch Slack")
+- The user asks if an app is installed (use action "search")
+- If the app is not found, share the install suggestions from the tool result
+- If the user wants to install a missing app, use web_search to find installation instructions
+- Common abbreviations are supported: "code" = VS Code, "chrome" = Google Chrome, etc.`
+}
+
+/** Get the list of enabled tool names based on config flags. */
+function getEnabledToolNames(config: AIConfig): string[] {
+  const enabled: string[] = []
+  if (config.webSearchEnabled !== false) enabled.push('web_search')
+  if (config.openAppEnabled !== false) enabled.push('open_app')
+  return enabled
+}
+
+/** Build tools addendum for only the enabled tools. */
+function buildToolsAddendum(config: AIConfig): string {
+  const enabled = getEnabledToolNames(config)
+  if (enabled.length === 0) return ''
+  const hints = enabled
+    .map((name) => TOOL_HINTS[name])
+    .filter(Boolean)
+    .join('\n')
+  return `\nIMPORTANT: You have tools available:\n${hints}`
+}
 
 // ── Stream result types ──────────────────────────────────────
 interface StreamResult {
@@ -50,8 +80,8 @@ async function* streamAnthropic(
   messages: Record<string, unknown>[],
   config: AIConfig
 ): AsyncGenerator<StreamResult> {
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) +
-    (config.webSearchEnabled !== false ? SEARCH_ADDENDUM : '')
+  const enabledNames = getEnabledToolNames(config)
+  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
 
   const reqBody: Record<string, unknown> = {
     model: config.model || 'claude-sonnet-4-5-20251001',
@@ -61,10 +91,11 @@ async function* streamAnthropic(
     messages
   }
 
-  // webSearchEnabled defaults to true if undefined (for existing persisted stores)
-  if (config.webSearchEnabled !== false) {
-    reqBody.tools = formatToolsForProvider([WEB_SEARCH_TOOL], 'anthropic')
-    console.log('[AI:Anthropic] Tools included in request')
+  if (enabledNames.length > 0) {
+    const registry = getToolRegistry()
+    const tools = registry.getToolDefinitions().filter((t) => enabledNames.includes(t.name))
+    reqBody.tools = formatToolsForProvider(tools, 'anthropic')
+    console.log('[AI:Anthropic] Tools included:', enabledNames)
   }
 
   const body = JSON.stringify(reqBody)
@@ -133,8 +164,8 @@ async function* streamOpenAI(
   messages: Record<string, unknown>[],
   config: AIConfig
 ): AsyncGenerator<StreamResult> {
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) +
-    (config.webSearchEnabled !== false ? SEARCH_ADDENDUM : '')
+  const enabledNames = getEnabledToolNames(config)
+  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
 
   const reqBody: Record<string, unknown> = {
     model: config.model || 'gpt-4o-mini',
@@ -146,8 +177,10 @@ async function* streamOpenAI(
     ]
   }
 
-  if (config.webSearchEnabled !== false) {
-    reqBody.tools = formatToolsForProvider([WEB_SEARCH_TOOL], 'openai')
+  if (enabledNames.length > 0) {
+    const registry = getToolRegistry()
+    const tools = registry.getToolDefinitions().filter((t) => enabledNames.includes(t.name))
+    reqBody.tools = formatToolsForProvider(tools, 'openai')
   }
 
   const body = JSON.stringify(reqBody)
@@ -219,17 +252,19 @@ async function* streamGemini(
     }
   })
 
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) +
-    (config.webSearchEnabled !== false ? SEARCH_ADDENDUM : '')
+  const enabledNames = getEnabledToolNames(config)
+  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
 
   const reqBody: Record<string, unknown> = {
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents: geminiMessages
   }
 
-  if (config.webSearchEnabled !== false) {
-    reqBody.tools = formatToolsForProvider([WEB_SEARCH_TOOL], 'gemini')
-    console.log('[AI:Gemini] Tools included:', JSON.stringify(reqBody.tools))
+  if (enabledNames.length > 0) {
+    const registry = getToolRegistry()
+    const tools = registry.getToolDefinitions().filter((t) => enabledNames.includes(t.name))
+    reqBody.tools = formatToolsForProvider(tools, 'gemini')
+    console.log('[AI:Gemini] Tools included:', enabledNames)
   }
 
   const body = JSON.stringify(reqBody)
@@ -278,8 +313,8 @@ async function* streamOllama(
   messages: Record<string, unknown>[],
   config: AIConfig
 ): AsyncGenerator<StreamResult> {
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) +
-    (config.webSearchEnabled !== false ? SEARCH_ADDENDUM : '')
+  const enabledNames = getEnabledToolNames(config)
+  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
 
   const reqBody: Record<string, unknown> = {
     model: config.model || 'llama3.2',
@@ -290,8 +325,10 @@ async function* streamOllama(
     ]
   }
 
-  if (config.webSearchEnabled !== false) {
-    reqBody.tools = formatToolsForProvider([WEB_SEARCH_TOOL], 'ollama')
+  if (enabledNames.length > 0) {
+    const registry = getToolRegistry()
+    const tools = registry.getToolDefinitions().filter((t) => enabledNames.includes(t.name))
+    reqBody.tools = formatToolsForProvider(tools, 'ollama')
   }
 
   const body = JSON.stringify(reqBody)
@@ -454,32 +491,26 @@ export function setupAIHandlers(): void {
             break
           }
 
-          // Execute the tool call
+          // Execute the tool call via registry
           console.log('[AI] Executing tool:', collectedToolCall.name, collectedToolCall.arguments)
-          event.sender.send('ai:tool_status', `Searching the web...`)
+
+          const registry = getToolRegistry()
+          const tool = registry.get(collectedToolCall.name)
+          event.sender.send('ai:tool_status', tool?.statusMessage || `Using ${collectedToolCall.name}...`)
 
           let toolResult: string
           try {
-            if (collectedToolCall.name === 'web_search') {
-              toolResult = await webSearch(
-                collectedToolCall.arguments.query as string,
-                config.tavilyApiKey || undefined
+            if (registry.has(collectedToolCall.name)) {
+              toolResult = await registry.call(
+                collectedToolCall.name,
+                collectedToolCall.arguments,
+                { config: { tavilyApiKey: config.tavilyApiKey } }
               )
             } else {
               toolResult = `Unknown tool: ${collectedToolCall.name}`
             }
           } catch (err) {
-            if (err instanceof SearchError) {
-              if (err.code === 'invalid_key') {
-                toolResult = 'Search failed: Invalid Tavily API key. Please check your settings.'
-              } else if (err.code === 'rate_limited') {
-                toolResult = 'Search failed: Rate limit reached. Try again later.'
-              } else {
-                toolResult = `Search failed: ${err.message}`
-              }
-            } else {
-              toolResult = `Search failed: ${String(err)}`
-            }
+            toolResult = `Tool failed: ${err instanceof Error ? err.message : String(err)}`
           }
 
           console.log('[AI] Tool result (first 500 chars):', toolResult.slice(0, 500))
