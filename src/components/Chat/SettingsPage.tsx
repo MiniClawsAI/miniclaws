@@ -35,7 +35,8 @@ export function SettingsPage() {
     ...aiConfig,
     model: validModel(aiConfig.provider, aiConfig.model),
     webSearchEnabled: aiConfig.webSearchEnabled ?? true,
-    openAppEnabled: aiConfig.openAppEnabled ?? true
+    openAppEnabled: aiConfig.openAppEnabled ?? true,
+    seeScreenEnabled: aiConfig.seeScreenEnabled ?? true
   })
   const [saved, setSaved] = useState(false)
 
@@ -173,6 +174,23 @@ export function SettingsPage() {
                 type="checkbox"
                 checked={local.openAppEnabled}
                 onChange={(e) => setLocal({ ...local, openAppEnabled: e.target.checked })}
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* See Screen */}
+        <div className={styles.toolItem}>
+          <div className={styles.field}>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>See Screen</span>
+                <span className={styles.toolDesc}>Look at your screen and respond to what's visible</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.seeScreenEnabled}
+                onChange={(e) => setLocal({ ...local, seeScreenEnabled: e.target.checked })}
               />
             </label>
           </div>

@@ -1,7 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import https from 'https'
 import http from 'http'
-import { getToolRegistry } from './tool-registry'
+import { getToolRegistry, type ToolResult } from './tool-registry'
 import {
   formatToolsForProvider,
   formatToolResultMessage,
@@ -19,6 +19,7 @@ export interface AIConfig {
   systemPrompt?: string
   webSearchEnabled?: boolean
   openAppEnabled?: boolean
+  seeScreenEnabled?: boolean
   tavilyApiKey?: string
 }
 
@@ -46,7 +47,19 @@ open_app — Open applications on the user's computer. Use it when:
 - The user asks if an app is installed (use action "search")
 - If the app is not found, share the install suggestions from the tool result
 - If the user wants to install a missing app, use web_search to find installation instructions
-- Common abbreviations are supported: "code" = VS Code, "chrome" = Google Chrome, etc.`
+- Common abbreviations are supported: "code" = VS Code, "chrome" = Google Chrome, etc.`,
+
+  see_screen: `
+see_screen — Capture a screenshot of the user's screen. Use it when:
+- The user asks you to look at, see, or analyze their screen
+- The user asks "what's on my screen" or "what am I looking at"
+- The user asks for help with something visible on their display
+- The user says "look at this" or "can you see this"
+You will receive the screenshot as an image. Describe what you see and respond helpfully.
+If the result contains "SCREEN_PERMISSION_NEEDED", it means the OS blocked screen capture.
+The privacy settings have already been opened automatically for the user.
+Respond warmly — tell them you opened the settings, they just need to enable MiniClaws
+in the Screen Recording list and restart the app. Keep it friendly and brief!`
 }
 
 /** Get the list of enabled tool names based on config flags. */
@@ -54,6 +67,7 @@ function getEnabledToolNames(config: AIConfig): string[] {
   const enabled: string[] = []
   if (config.webSearchEnabled !== false) enabled.push('web_search')
   if (config.openAppEnabled !== false) enabled.push('open_app')
+  if (config.seeScreenEnabled !== false) enabled.push('see_screen')
   return enabled
 }
 
@@ -498,7 +512,7 @@ export function setupAIHandlers(): void {
           const tool = registry.get(collectedToolCall.name)
           event.sender.send('ai:tool_status', tool?.statusMessage || `Using ${collectedToolCall.name}...`)
 
-          let toolResult: string
+          let toolResult: ToolResult
           try {
             if (registry.has(collectedToolCall.name)) {
               toolResult = await registry.call(
@@ -513,7 +527,11 @@ export function setupAIHandlers(): void {
             toolResult = `Tool failed: ${err instanceof Error ? err.message : String(err)}`
           }
 
-          console.log('[AI] Tool result (first 500 chars):', toolResult.slice(0, 500))
+          if (typeof toolResult === 'string') {
+            console.log('[AI] Tool result (first 500 chars):', toolResult.slice(0, 500))
+          } else {
+            console.log(`[AI] Tool result: ${toolResult.mimeType} image (${toolResult.base64.length} chars base64)`)
+          }
 
           // Append assistant tool-call + tool result to conversation
           conversation = [

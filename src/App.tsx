@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react'
 import { CharacterScene } from './components/Character/CharacterScene'
 import { CharacterPicker } from './components/Character/CharacterPicker'
 import { ChatPanel } from './components/Chat/ChatPanel'
-import { rehydrateStore } from './store'
+import { useStore, rehydrateStore } from './store'
 import styles from './App.module.css'
 
 export default function App() {
   const [showPicker, setShowPicker] = useState(false)
-  const [threadOpen, setThreadOpen] = useState(false)
+  const { isChatOpen: threadOpen, setChatOpen: setThreadOpen } = useStore()
   const [suppressHover, setSuppressHover] = useState(false)
 
   useEffect(() => {

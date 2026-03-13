@@ -40,8 +40,21 @@ export interface RegisteredTool {
   handler: (
     args: Record<string, unknown>,
     context: ToolContext
-  ) => Promise<string>
+  ) => Promise<ToolResult>
 }
+
+// ── Tool result (string or image) ────────────────────────────
+
+export interface ToolImageResult {
+  type: 'image'
+  mimeType: 'image/png' | 'image/jpeg'
+  base64: string
+  /** Optional text description accompanying the image. */
+  text?: string
+}
+
+/** A tool handler can return plain text or an image result. */
+export type ToolResult = string | ToolImageResult
 
 export type RiskLevel = 'safe' | 'caution' | 'sensitive' | 'dangerous'
 
@@ -142,7 +155,7 @@ class ToolRegistry {
     name: string,
     args: Record<string, unknown>,
     extraContext?: Partial<ToolContext>
-  ): Promise<string> {
+  ): Promise<ToolResult> {
     const tool = this.#tools.get(name)
     if (!tool) throw new Error(`Unknown tool: ${name}`)
 

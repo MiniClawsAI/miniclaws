@@ -78,6 +78,10 @@ export function CharacterScene() {
             text={speechText}
             isStreaming={isStreaming}
             onClose={() => setSpeechText('')}
+            onClick={() => {
+              setSpeechText('')
+              setChatOpen(true)
+            }}
           />
         </div>
       )}

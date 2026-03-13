@@ -5,6 +5,8 @@ import { setupAIHandlers } from './ipc/ai'
 import { initToolRegistry } from './ipc/tool-registry'
 import { webSearchTool } from './ipc/tools/web-search.tool'
 import { openAppTool } from './ipc/tools/open-app.tool'
+import { seeScreenTool } from './ipc/tools/see-screen.tool'
+import { setMainWindow } from './ipc/system-api'
 
 let mainWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
@@ -212,9 +214,11 @@ app.whenReady().then(() => {
   const registry = initToolRegistry()
   registry.register(webSearchTool)
   registry.register(openAppTool)
+  registry.register(seeScreenTool)
 
   setupAIHandlers()
   createWindow()
+  setMainWindow(mainWindow)
   createTray()
 
   app.on('activate', () => {
