@@ -1,11 +1,10 @@
-import { Suspense, useRef, useCallback, useState, useEffect } from 'react'
+import { Suspense, useRef, useCallback, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useStore } from '../../store'
 import { getCharacter } from '../../characters'
 import { VRMAvatar } from './VRMAvatar'
 import { CharacterRenderer } from './CharacterRenderer'
 import { SpeechBubble } from './SpeechBubble'
-import { ContextMenu } from '../Chat/ContextMenu'
 import styles from './CharacterScene.module.css'
 
 function CameraZoom() {
@@ -35,7 +34,6 @@ export function CharacterScene() {
   // ── Dragging ───────────────────────────────────────────────
   const isDragging = useRef(false)
   const dragStart  = useRef({ mx: 0, my: 0, wx: 0, wy: 0 })
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
 
   const onPointerDown = useCallback(async (e: React.PointerEvent) => {
     if (e.button !== 0) return
@@ -63,17 +61,11 @@ export function CharacterScene() {
     // Chat thread is opened via the input bar expand button or speech bubble click
   }, [])
 
-  const onContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setContextMenu({ x: e.clientX, y: e.clientY })
-  }, [])
-
-  const closeContext = useCallback(() => setContextMenu(null), [])
 
   return (
     <div className={styles.wrapper}>
       {/* Speech bubble floats above canvas */}
-      {(speechText || isStreaming) && (
+      {!isChatOpen && (speechText || isStreaming) && (
         <div className={styles.bubble}>
           <SpeechBubble
             text={speechText}
@@ -92,7 +84,7 @@ export function CharacterScene() {
         className={styles.canvas}
         onPointerDown={onPointerDown}
         onClick={onClick}
-        onContextMenu={onContextMenu}
+        onContextMenu={(e) => e.preventDefault()}
         style={{ cursor: 'grab' }}
       >
         <Canvas
@@ -126,14 +118,6 @@ export function CharacterScene() {
         </Canvas>
       </div>
 
-      {/* Right-click context menu */}
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          onClose={closeContext}
-        />
-      )}
     </div>
   )
 }

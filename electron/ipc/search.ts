@@ -131,10 +131,13 @@ async function scraperSearch(query: string): Promise<string> {
     // Combine: deep content first (most useful), then snippet summaries
     let result = ''
     if (deepContent) {
-      result += `## Content from ${filtered[0]?.title || topUrl}\n${deepContent}\n\n`
+      result += `## Content from ${filtered[0]?.title || topUrl}\nURL: ${topUrl}\n${deepContent}\n\n`
     }
     result += filtered
-      .map(r => `### ${r.title}\n${r.snippet}`)
+      .map(r => {
+        const realUrl = extractRealUrl(r.url)
+        return `### ${r.title}\nURL: ${realUrl}\n${r.snippet}`
+      })
       .join('\n\n')
 
     return result
@@ -202,6 +205,6 @@ async function fetchPageContent(win: BrowserWindow, url: string): Promise<string
 // ── Shared normalizer ────────────────────────────────────────
 function normalizeResults(results: SearchResult[]): string {
   return results
-    .map(r => `### ${r.title}\n${r.url}\n${r.snippet}`)
+    .map(r => `### ${r.title}\nURL: ${r.url}\n${r.snippet}`)
     .join('\n\n')
 }

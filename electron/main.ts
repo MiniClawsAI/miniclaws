@@ -6,6 +6,8 @@ import { initToolRegistry } from './ipc/tool-registry'
 import { webSearchTool } from './ipc/tools/web-search.tool'
 import { openAppTool } from './ipc/tools/open-app.tool'
 import { seeScreenTool } from './ipc/tools/see-screen.tool'
+import { mapsTool } from './ipc/tools/maps.tool'
+import { browseTool } from './ipc/tools/browse.tool'
 import { setMainWindow } from './ipc/system-api'
 
 let mainWindow: BrowserWindow | null = null
@@ -86,6 +88,13 @@ function createWindow(): void {
   ipcMain.handle('get-screen-size', () => {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize
     return { width, height }
+  })
+
+  // IPC: open external URL in default browser
+  ipcMain.on('open-external', (_e, url: string) => {
+    if (typeof url === 'string' && /^https?:\/\//i.test(url)) {
+      shell.openExternal(url)
+    }
   })
 
   // IPC: open settings in separate window
@@ -215,6 +224,8 @@ app.whenReady().then(() => {
   registry.register(webSearchTool)
   registry.register(openAppTool)
   registry.register(seeScreenTool)
+  registry.register(mapsTool)
+  registry.register(browseTool)
 
   setupAIHandlers()
   createWindow()

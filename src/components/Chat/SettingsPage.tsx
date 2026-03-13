@@ -36,7 +36,10 @@ export function SettingsPage() {
     model: validModel(aiConfig.provider, aiConfig.model),
     webSearchEnabled: aiConfig.webSearchEnabled ?? true,
     openAppEnabled: aiConfig.openAppEnabled ?? true,
-    seeScreenEnabled: aiConfig.seeScreenEnabled ?? true
+    seeScreenEnabled: aiConfig.seeScreenEnabled ?? true,
+    mapsEnabled: aiConfig.mapsEnabled ?? true,
+    mapsProvider: aiConfig.mapsProvider || 'auto',
+    browseEnabled: aiConfig.browseEnabled ?? true
   })
   const [saved, setSaved] = useState(false)
 
@@ -191,6 +194,72 @@ export function SettingsPage() {
                 type="checkbox"
                 checked={local.seeScreenEnabled}
                 onChange={(e) => setLocal({ ...local, seeScreenEnabled: e.target.checked })}
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Maps */}
+        <div className={styles.toolItem}>
+          <div className={styles.field}>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>Maps</span>
+                <span className={styles.toolDesc}>Search locations and get directions</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.mapsEnabled}
+                onChange={(e) => setLocal({ ...local, mapsEnabled: e.target.checked })}
+              />
+            </label>
+          </div>
+
+          {local.mapsEnabled && (
+            <div className={styles.toolSettings}>
+              <div className={styles.field}>
+                <label>Maps app</label>
+                <div className={styles.selectWrap}>
+                  <select
+                    value={local.mapsProvider}
+                    onChange={(e) => setLocal({ ...local, mapsProvider: e.target.value })}
+                  >
+                    <option value="auto">Auto (native app first, then browser)</option>
+                    {navigator.platform?.includes('Mac') && (
+                      <option value="apple_maps">Apple Maps</option>
+                    )}
+                    {navigator.platform?.includes('Win') && (
+                      <option value="windows_maps">Windows Maps</option>
+                    )}
+                    {navigator.platform?.includes('Linux') && (
+                      <option value="gnome_maps">GNOME Maps</option>
+                    )}
+                    <option value="google">Google Maps (browser)</option>
+                    <option value="waze">Waze (browser)</option>
+                    <option value="openstreetmap">OpenStreetMap (browser)</option>
+                    <option value="bing">Bing Maps (browser)</option>
+                  </select>
+                </div>
+                <span className={styles.hint}>
+                  "Auto" tries native apps first (Apple Maps, Windows Maps), falls back to Google Maps in your browser
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Browse */}
+        <div className={styles.toolItem}>
+          <div className={styles.field}>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>Browse Web</span>
+                <span className={styles.toolDesc}>Open, read, and screenshot webpages</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.browseEnabled}
+                onChange={(e) => setLocal({ ...local, browseEnabled: e.target.checked })}
               />
             </label>
           </div>

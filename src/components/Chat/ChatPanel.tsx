@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { useStore } from '../../store'
+import { LinkifiedText } from './LinkifiedText'
 import styles from './ChatPanel.module.css'
 
 interface ChatPanelProps {
@@ -167,7 +168,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
                 key={i}
                 className={`${styles.msg} ${msg.role === 'user' ? styles.user : styles.assistant}`}
               >
-                <div className={styles.bubble}>{msg.content}</div>
+                <div className={styles.bubble}><LinkifiedText text={msg.content} /></div>
               </div>
             ))}
             {toolStatus && !streamingText && (
@@ -180,7 +181,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
             {streamingText && (
               <div className={`${styles.msg} ${styles.assistant}`}>
                 <div className={styles.bubble}>
-                  {streamingText}
+                  <LinkifiedText text={streamingText} />
                   <span className={styles.cursor}>▋</span>
                 </div>
               </div>
@@ -191,7 +192,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       </div>
 
       {/* Input bar — always visible */}
-      <div className={styles.inputBar}>
+      <div className={styles.inputBar} onClick={() => inputRef.current?.focus()}>
         <button
           className={styles.expandBtn}
           onClick={onToggleThread}

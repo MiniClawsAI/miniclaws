@@ -20,6 +20,9 @@ export interface AIConfig {
   webSearchEnabled?: boolean
   openAppEnabled?: boolean
   seeScreenEnabled?: boolean
+  mapsEnabled?: boolean
+  mapsProvider?: string
+  browseEnabled?: boolean
   tavilyApiKey?: string
 }
 
@@ -39,7 +42,8 @@ web_search — Search the web. You MUST use it whenever:
 - The user asks about current events, news, weather, or real-time information
 - The user asks about something you're not confident about
 - The user asks for recent data, prices, scores, or status updates
-Do NOT make up or guess at current information — always search first.`,
+Do NOT make up or guess at current information — always search first.
+IMPORTANT: Always include source URLs in your response so the user can click to read more. Format: "Source: https://..." or include links inline.`,
 
   open_app: `
 open_app — Open applications on the user's computer. Use it when:
@@ -48,6 +52,19 @@ open_app — Open applications on the user's computer. Use it when:
 - If the app is not found, share the install suggestions from the tool result
 - If the user wants to install a missing app, use web_search to find installation instructions
 - Common abbreviations are supported: "code" = VS Code, "chrome" = Google Chrome, etc.`,
+
+  maps: `
+maps — Search for locations, addresses, or places on a map. Use it when:
+- The user asks about a place, location, address, or directions
+- The user says "show me on a map", "find nearby", "how do I get to"
+- The user asks for restaurants, cafés, shops, or services nearby
+- The user mentions a specific address or landmark
+Opens the user's preferred maps app (native app if available, browser otherwise).
+"Near me" queries are automatically enriched with the user's approximate location.
+The tool result will include the detected location so you can mention it naturally.
+IMPORTANT: When web_search finds locations or businesses, include a Google Maps link so the user can view them:
+https://www.google.com/maps/search/PLACE+NAME+ADDRESS
+This lets the user click to see the location on a map.`,
 
   see_screen: `
 see_screen — Capture a screenshot of the user's screen. Use it when:
@@ -59,7 +76,18 @@ You will receive the screenshot as an image. Describe what you see and respond h
 If the result contains "SCREEN_PERMISSION_NEEDED", it means the OS blocked screen capture.
 The privacy settings have already been opened automatically for the user.
 Respond warmly — tell them you opened the settings, they just need to enable MiniClaws
-in the Screen Recording list and restart the app. Keep it friendly and brief!`
+in the Screen Recording list and restart the app. Keep it friendly and brief!`,
+
+  browse: `
+browse — Browse the web: open pages, read content, or screenshot websites. Use it when:
+- The user asks you to "go to" or "open" a website (use action "open")
+- You need to read a webpage for research, summarizing, or answering questions (use action "read")
+- The user wants to see what a website looks like (use action "screenshot")
+- You found a URL from web_search and need to read the full article
+Actions: "open" (opens in user's browser), "read" (extracts text), "screenshot" (visual capture)
+For research: use web_search to find URLs, then browse.read to get full content.
+If "read" returns little text, try "screenshot" — the page may be JS-heavy or require login.
+IMPORTANT: When sharing information from web pages, always include the source URL so the user can click to visit the page directly.`
 }
 
 /** Get the list of enabled tool names based on config flags. */
@@ -68,6 +96,8 @@ function getEnabledToolNames(config: AIConfig): string[] {
   if (config.webSearchEnabled !== false) enabled.push('web_search')
   if (config.openAppEnabled !== false) enabled.push('open_app')
   if (config.seeScreenEnabled !== false) enabled.push('see_screen')
+  if (config.mapsEnabled !== false) enabled.push('maps')
+  if (config.browseEnabled !== false) enabled.push('browse')
   return enabled
 }
 
@@ -80,6 +110,43 @@ function buildToolsAddendum(config: AIConfig): string {
     .filter(Boolean)
     .join('\n')
   return `\nIMPORTANT: You have tools available:\n${hints}`
+}
+
+/** Known training data cutoff dates per model family. */
+const TRAINING_CUTOFFS: Record<string, string> = {
+  'claude': 'early 2025',
+  'gpt-4': 'October 2023',
+  'gpt-4o': 'October 2023',
+  'gpt-4.1': 'June 2024',
+  'gemini': 'late 2024',
+  'llama': 'December 2023',
+  'mistral': 'mid 2024'
+}
+
+function getTrainingCutoff(model?: string): string {
+  if (!model) return 'several months ago'
+  const lower = model.toLowerCase()
+  for (const [prefix, cutoff] of Object.entries(TRAINING_CUTOFFS)) {
+    if (lower.includes(prefix)) return cutoff
+  }
+  return 'several months ago'
+}
+
+/** Build the full system prompt with date awareness + tools. */
+function buildSystemPrompt(config: AIConfig): string {
+  const base = config.systemPrompt || DEFAULT_SYSTEM
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  })
+  const cutoff = getTrainingCutoff(config.model)
+
+  const dateContext = `\n\nIMPORTANT — Date awareness:
+Today is ${today}.
+Your training data only goes up to ${cutoff}. Anything after that date may be outdated or wrong.
+NEVER guess or use your training data for: current events, news, weather, prices, scores, stock data, release dates, or any time-sensitive information.
+If the user asks about anything that could have changed since ${cutoff}, you MUST use web_search first — do not answer from memory.`
+
+  return base + dateContext + buildToolsAddendum(config)
 }
 
 // ── Stream result types ──────────────────────────────────────
@@ -95,7 +162,7 @@ async function* streamAnthropic(
   config: AIConfig
 ): AsyncGenerator<StreamResult> {
   const enabledNames = getEnabledToolNames(config)
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
+  const systemPrompt = buildSystemPrompt(config)
 
   const reqBody: Record<string, unknown> = {
     model: config.model || 'claude-sonnet-4-5-20251001',
@@ -179,7 +246,7 @@ async function* streamOpenAI(
   config: AIConfig
 ): AsyncGenerator<StreamResult> {
   const enabledNames = getEnabledToolNames(config)
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
+  const systemPrompt = buildSystemPrompt(config)
 
   const reqBody: Record<string, unknown> = {
     model: config.model || 'gpt-4o-mini',
@@ -267,7 +334,7 @@ async function* streamGemini(
   })
 
   const enabledNames = getEnabledToolNames(config)
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
+  const systemPrompt = buildSystemPrompt(config)
 
   const reqBody: Record<string, unknown> = {
     system_instruction: { parts: [{ text: systemPrompt }] },
@@ -328,7 +395,7 @@ async function* streamOllama(
   config: AIConfig
 ): AsyncGenerator<StreamResult> {
   const enabledNames = getEnabledToolNames(config)
-  const systemPrompt = (config.systemPrompt || DEFAULT_SYSTEM) + buildToolsAddendum(config)
+  const systemPrompt = buildSystemPrompt(config)
 
   const reqBody: Record<string, unknown> = {
     model: config.model || 'llama3.2',
@@ -518,7 +585,7 @@ export function setupAIHandlers(): void {
               toolResult = await registry.call(
                 collectedToolCall.name,
                 collectedToolCall.arguments,
-                { config: { tavilyApiKey: config.tavilyApiKey } }
+                { config: { tavilyApiKey: config.tavilyApiKey, mapsProvider: config.mapsProvider } }
               )
             } else {
               toolResult = `Unknown tool: ${collectedToolCall.name}`

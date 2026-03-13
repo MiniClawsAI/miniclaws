@@ -55,6 +55,11 @@ contextBridge.exposeInMainWorld('electron', {
     const handler = () => cb()
     ipcRenderer.on('settings-changed', handler)
     return () => ipcRenderer.removeListener('settings-changed', handler)
+  },
+
+  // ── External links ─────────────────────────────────────
+  openExternal: (url: string) => {
+    ipcRenderer.send('open-external', url)
   }
 })
 
@@ -75,6 +80,7 @@ declare global {
       onSuppressHover: (cb: (suppress: boolean) => void) => () => void
       onToolStatus: (cb: (status: string) => void) => () => void
       onSettingsChanged: (cb: () => void) => () => void
+      openExternal: (url: string) => void
     }
   }
 }

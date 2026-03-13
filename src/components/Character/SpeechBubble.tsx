@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { LinkifiedText } from '../Chat/LinkifiedText'
 import styles from './SpeechBubble.module.css'
 
 interface SpeechBubbleProps {
@@ -70,7 +71,7 @@ export function SpeechBubble({ text, isStreaming, onClose, onClick }: SpeechBubb
           </span>
         ) : (
           <>
-            <span className={styles.text}>{displayText}</span>
+            <span className={styles.text}><LinkifiedText text={displayText} /></span>
             {isStreaming && <span className={styles.cursor}>▋</span>}
           </>
         )}
