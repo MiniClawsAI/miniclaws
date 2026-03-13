@@ -34,6 +34,8 @@ export function LobsterChar({ emotion, isTalking, appearance }: LobsterCharProps
       headLookAmount: 0.06,
       pupilBaseX: 0.09,
       pupilBaseY: 0.06,
+      armRestL: 0.6,
+      armRestR: -0.6,
     }
   )
 

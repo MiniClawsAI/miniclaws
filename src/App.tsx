@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { CharacterScene } from './components/Character/CharacterScene'
 import { CharacterPicker } from './components/Character/CharacterPicker'
 import { ChatPanel } from './components/Chat/ChatPanel'
+import { rehydrateStore } from './store'
 import styles from './App.module.css'
 
 export default function App() {
@@ -11,6 +12,11 @@ export default function App() {
 
   useEffect(() => {
     return window.electron.onSuppressHover(setSuppressHover)
+  }, [])
+
+  // Reload store when settings window closes
+  useEffect(() => {
+    return window.electron.onSettingsChanged(() => rehydrateStore())
   }, [])
 
   return (

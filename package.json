@@ -1,7 +1,7 @@
 {
-  "name": "companion",
+  "name": "miniclaws",
   "version": "1.0.0",
-  "description": "3D AI desktop companion - floating VRM character with chat",
+  "description": "MiniClaws - 3D AI desktop companion with chat",
   "main": "./out/main/index.js",
   "author": "marizmelo",
   "private": true,
@@ -39,12 +39,14 @@
     "vite": "^5.4.11"
   },
   "build": {
-    "appId": "com.companion.app",
-    "productName": "Companion",
+    "appId": "com.miniclaws.app",
+    "productName": "MiniClaws",
     "directories": { "output": "dist" },
     "files": ["out/**/*", "resources/**/*"],
+    "icon": "resources/icon.png",
     "mac": {
       "category": "public.app-category.utilities",
+      "icon": "resources/icon.png",
       "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }]
     },
     "win": {

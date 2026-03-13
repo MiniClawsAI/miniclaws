@@ -166,7 +166,7 @@ export function SettingsPage() {
             rows={5}
             value={local.systemPrompt || ''}
             onChange={(e) => setLocal({ ...local, systemPrompt: e.target.value })}
-            placeholder="Describe how the companion should behave..."
+            placeholder="Describe how MiniClaws should behave..."
           />
         </div>
       </section>

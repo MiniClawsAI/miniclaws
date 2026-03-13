@@ -145,7 +145,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             rows={4}
             value={local.systemPrompt || ''}
             onChange={(e) => setLocal({ ...local, systemPrompt: e.target.value })}
-            placeholder="Describe how the companion should behave..."
+            placeholder="Describe how MiniClaws should behave..."
           />
         </div>
 

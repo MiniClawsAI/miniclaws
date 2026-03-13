@@ -29,6 +29,8 @@ interface AnimationOptions {
   pupilBaseX?: number
   pupilBaseY?: number
   browBaseY?: number
+  armRestL?: number
+  armRestR?: number
 }
 
 const emotionBrow: Record<CharacterEmotion, number> = {
@@ -54,7 +56,9 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     headLookAmount = 0.1,
     pupilBaseX = 0.1,
     pupilBaseY = 0.06,
-    browBaseY = 0.18
+    browBaseY = 0.18,
+    armRestL = -0.15,
+    armRestR = 0.15
   } = options
 
   useFrame((_, delta) => {
@@ -147,14 +151,14 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     // Arm swing — smoothly gesture more when talking
     const armSwing = 0.04 + tb * 0.08
     if (refs.armL?.current) {
-      refs.armL.current.rotation.z = 0.6 + Math.sin(time * 0.9) * armSwing
-      if (emotion === 'wave') refs.armL.current.rotation.z = 0.6
+      refs.armL.current.rotation.z = armRestL + Math.sin(time * 0.9) * armSwing
+      if (emotion === 'wave') refs.armL.current.rotation.z = armRestL
     }
     if (refs.armR?.current) {
       if (emotion === 'wave') {
-        refs.armR.current.rotation.z = -0.8 - Math.sin(time * 4) * 0.3
+        refs.armR.current.rotation.z = armRestR - 0.65 - Math.sin(time * 4) * 0.3
       } else {
-        refs.armR.current.rotation.z = -0.6 + Math.sin(time * 0.9 + 1) * armSwing
+        refs.armR.current.rotation.z = armRestR + Math.sin(time * 0.9 + 1) * armSwing
       }
     }
     const forearmSwing = 0.05 + tb * 0.1

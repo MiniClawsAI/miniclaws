@@ -112,7 +112,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       >
         <div className={styles.threadPanel}>
           <div className={styles.header}>
-            <span className={styles.title}>✦ Companion</span>
+            <span className={styles.title}>✦ MiniClaws</span>
             <div className={styles.headerRight}>
               <button
                 className={styles.minimizeBtn}

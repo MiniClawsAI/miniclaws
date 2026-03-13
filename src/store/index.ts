@@ -32,6 +32,16 @@ interface CompanionStore {
   setCharacterId: (id: string) => void
 }
 
+// Migrate data from old store name (companion-store → miniclaws-store)
+try {
+  const OLD_KEY = 'companion-store'
+  const NEW_KEY = 'miniclaws-store'
+  if (typeof localStorage !== 'undefined' && localStorage.getItem(OLD_KEY) && !localStorage.getItem(NEW_KEY)) {
+    localStorage.setItem(NEW_KEY, localStorage.getItem(OLD_KEY)!)
+    localStorage.removeItem(OLD_KEY)
+  }
+} catch { /* ignore in non-browser env */ }
+
 export const useStore = create<CompanionStore>()(
   persist(
     (set) => ({
@@ -41,7 +51,7 @@ export const useStore = create<CompanionStore>()(
         apiKey: '',
         model: 'claude-haiku-4-5-20251001',
         systemPrompt:
-          "You are a friendly 3D desktop companion. Be helpful, witty, and concise — 1-3 sentences unless asked for more. You live on the user's desktop and assist them throughout the day.",
+          "You are MiniClaws, a friendly 3D desktop companion. Be helpful, witty, and concise — 1-3 sentences unless asked for more. You live on the user's desktop and assist them throughout the day.",
         webSearchEnabled: true,
         tavilyApiKey: ''
       },
@@ -68,11 +78,11 @@ export const useStore = create<CompanionStore>()(
       setSpeechText: (t) => set({ speechText: t }),
       vrmPath: null,
       setVrmPath: (p) => set({ vrmPath: p }),
-      characterId: 'default',
+      characterId: 'snappy',
       setCharacterId: (id) => set({ characterId: id })
     }),
     {
-      name: 'companion-store',
+      name: 'miniclaws-store',
       partialize: (s) => ({
         aiConfig: s.aiConfig,
         messages: s.messages.slice(-50), // keep last 50
@@ -82,3 +92,18 @@ export const useStore = create<CompanionStore>()(
     }
   )
 )
+
+/** Reload persisted state from localStorage (called when settings window closes) */
+export function rehydrateStore(): void {
+  try {
+    const raw = localStorage.getItem('miniclaws-store')
+    if (!raw) return
+    const { state } = JSON.parse(raw)
+    if (state?.aiConfig) {
+      useStore.setState({ aiConfig: state.aiConfig })
+    }
+    if (state?.characterId) {
+      useStore.setState({ characterId: state.characterId })
+    }
+  } catch { /* ignore */ }
+}

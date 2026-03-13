@@ -50,6 +50,11 @@ contextBridge.exposeInMainWorld('electron', {
     const handler = (_: unknown, status: string) => cb(status)
     ipcRenderer.on('ai:tool_status', handler)
     return () => ipcRenderer.removeListener('ai:tool_status', handler)
+  },
+  onSettingsChanged: (cb: () => void) => {
+    const handler = () => cb()
+    ipcRenderer.on('settings-changed', handler)
+    return () => ipcRenderer.removeListener('settings-changed', handler)
   }
 })
 
@@ -69,6 +74,7 @@ declare global {
       openSettings: () => void
       onSuppressHover: (cb: (suppress: boolean) => void) => () => void
       onToolStatus: (cb: (status: string) => void) => () => void
+      onSettingsChanged: (cb: () => void) => () => void
     }
   }
 }

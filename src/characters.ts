@@ -75,6 +75,18 @@ export type CharacterType = CharacterAppearance['type']
 
 // ── Presets ──────────────────────────────────────────────────
 export const CHARACTERS: CharacterAppearance[] = [
+  // ── Lobsters ───────────────────────────────────────────────
+  {
+    type: 'lobster', id: 'snappy', name: 'Claw',
+    shell: '#d44030', shellDark: '#a02820', claw: '#e85040', belly: '#f0b898',
+    mouth: '#c03030', pupil: '#1a0808', blush: '#e07060',
+  },
+  {
+    type: 'lobster', id: 'coral', name: 'Coral',
+    shell: '#e07050', shellDark: '#b84838', claw: '#f09070', belly: '#fce0c8',
+    mouth: '#d05050', pupil: '#2a1010', blush: '#f09888',
+  },
+
   // ── People ─────────────────────────────────────────────────
   {
     type: 'person', id: 'default', name: 'Alex',
@@ -147,18 +159,6 @@ export const CHARACTERS: CharacterAppearance[] = [
     mouth: '#a04848', pupil: '#1a0e04', blush: '#c08868',
   },
 
-  // ── Lobsters ───────────────────────────────────────────────
-  {
-    type: 'lobster', id: 'snappy', name: 'Snappy',
-    shell: '#d44030', shellDark: '#a02820', claw: '#e85040', belly: '#f0b898',
-    mouth: '#c03030', pupil: '#1a0808', blush: '#e07060',
-  },
-  {
-    type: 'lobster', id: 'coral', name: 'Coral',
-    shell: '#e07050', shellDark: '#b84838', claw: '#f09070', belly: '#fce0c8',
-    mouth: '#d05050', pupil: '#2a1010', blush: '#f09888',
-  },
-
   // ── Robots ─────────────────────────────────────────────────
   {
     type: 'robot', id: 'sparky', name: 'Sparky',
@@ -216,4 +216,4 @@ export const TYPE_ICONS: Record<CharacterType, string> = {
   clippy: '📎',
 }
 
-export const TYPE_ORDER: CharacterType[] = ['person', 'monster', 'animal', 'lobster', 'robot', 'clippy']
+export const TYPE_ORDER: CharacterType[] = ['lobster', 'person', 'monster', 'animal', 'robot', 'clippy']

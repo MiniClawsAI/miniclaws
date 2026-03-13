@@ -141,13 +141,15 @@ function openSettingsWindow(): void {
     return
   }
 
+  const settingsIcon = nativeImage.createFromPath(join(__dirname, '../../resources/icon.png'))
   settingsWindow = new BrowserWindow({
     width: 420,
     height: 580,
     resizable: false,
     frame: true,
     transparent: false,
-    title: 'Companion Settings',
+    title: 'MiniClaws Settings',
+    icon: settingsIcon,
     backgroundColor: '#16142a',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -176,32 +178,16 @@ function openSettingsWindow(): void {
 }
 
 function createTray(): void {
-  // Create a small 16x16 tray icon (circle)
-  const icon = nativeImage.createEmpty()
-  const size = 16
-  const canvas = Buffer.alloc(size * size * 4)
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const dx = x - size / 2
-      const dy = y - size / 2
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      const idx = (y * size + x) * 4
-      if (dist <= size / 2 - 1) {
-        canvas[idx] = 167     // R
-        canvas[idx + 1] = 139 // G
-        canvas[idx + 2] = 250 // B
-        canvas[idx + 3] = 255 // A
-      }
-    }
-  }
-  const trayIcon = nativeImage.createFromBuffer(canvas, { width: size, height: size })
+  // Use the lobster icon from resources
+  const iconPath = join(__dirname, '../../resources/icon.png')
+  const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 })
 
   tray = new Tray(trayIcon)
-  tray.setToolTip('Companion')
+  tray.setToolTip('MiniClaws')
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show Companion',
+      label: 'Show MiniClaws',
       click: () => restoreWindow()
     },
     { type: 'separator' },
