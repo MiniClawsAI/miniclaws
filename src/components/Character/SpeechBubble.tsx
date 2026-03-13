@@ -42,9 +42,12 @@ export function SpeechBubble({ text, isStreaming, onClose, onClick }: SpeechBubb
   if (!text) return null
 
   // During streaming, show only the tail end for a typewriter feel
-  const displayText = isStreaming && text.length > 120
-    ? '…' + text.slice(-120)
-    : text
+  const isThinking = isStreaming && (!text || text === '…')
+  const displayText = isThinking
+    ? ''
+    : isStreaming && text.length > 120
+      ? '…' + text.slice(-120)
+      : text
 
   return (
     <div
@@ -59,8 +62,18 @@ export function SpeechBubble({ text, isStreaming, onClose, onClick }: SpeechBubb
       style={{ cursor: onClick ? 'pointer' : undefined }}
     >
       <div ref={contentRef} className={styles.content}>
-        <span className={styles.text}>{displayText}</span>
-        {isStreaming && <span className={styles.cursor}>▋</span>}
+        {isThinking ? (
+          <span className={styles.thinking}>
+            <span className={styles.dot} />
+            <span className={styles.dot} />
+            <span className={styles.dot} />
+          </span>
+        ) : (
+          <>
+            <span className={styles.text}>{displayText}</span>
+            {isStreaming && <span className={styles.cursor}>▋</span>}
+          </>
+        )}
       </div>
       <div className={styles.tail} />
       {!isStreaming && onClose && (

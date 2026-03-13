@@ -59,8 +59,9 @@ export function CharacterScene() {
 
   const onClick = useCallback(() => {
     if (isDragging.current) return
-    setChatOpen(!isChatOpen)
-  }, [isChatOpen, setChatOpen])
+    // Character click is reserved for future interactions (wave, etc.)
+    // Chat thread is opened via the input bar expand button or speech bubble click
+  }, [])
 
   const onContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault()

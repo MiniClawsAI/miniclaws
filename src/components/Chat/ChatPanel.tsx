@@ -43,6 +43,11 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     }
   }, [messages, streamingText, threadOpen])
 
+  const needsSetup = useCallback(() => {
+    const needsKey = aiConfig.provider !== 'ollama'
+    return needsKey && !aiConfig.apiKey?.trim()
+  }, [aiConfig])
+
   const sendMessage = useCallback(async () => {
     const text = input.trim()
     if (!text || isStreaming) return
@@ -50,10 +55,24 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     setInput('')
     inputRef.current?.focus()
     addMessage({ role: 'user', content: text })
+
+    // If no LLM is configured, nudge the user to settings
+    if (needsSetup()) {
+      const setupMsg =
+        "Hey! I need to be set up first before I can chat. " +
+        "I'm opening the settings for you — pick a provider and add your API key, then we can talk! 🐾"
+      addMessage({ role: 'assistant', content: setupMsg })
+      setSpeechText(setupMsg)
+      setEmotion('happy')
+      setTimeout(() => setEmotion('idle'), 3000)
+      window.electron.openSettings()
+      return
+    }
+
     setStreaming(true)
     clearStreamText()
     setEmotion('thinking')
-    setSpeechText('')
+    setSpeechText('…')
 
     // Clean previous listeners
     cleanups.current.forEach((fn) => fn())
@@ -92,7 +111,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     })
 
     cleanups.current = [offChunk, offDone, offErr]
-  }, [input, isStreaming, messages, aiConfig, addMessage, setStreaming, clearStreamText, appendStreamText, setEmotion, setSpeechText])
+  }, [input, isStreaming, messages, aiConfig, addMessage, setStreaming, clearStreamText, appendStreamText, setEmotion, setSpeechText, needsSetup])
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

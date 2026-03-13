@@ -173,6 +173,8 @@
 
 /* ── Input bar (always visible) ────────────────────────── */
 .inputBar {
+  position: relative;
+  z-index: 60;
   display: flex;
   gap: 6px;
   padding: 6px 8px;

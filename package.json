@@ -46,13 +46,17 @@
     "icon": "resources/icon.png",
     "mac": {
       "category": "public.app-category.utilities",
-      "icon": "resources/icon.png",
+      "icon": "resources/icon.icns",
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }]
     },
     "win": {
+      "icon": "resources/icon.ico",
       "target": [{ "target": "nsis", "arch": ["x64"] }]
     },
     "linux": {
+      "icon": "resources/icon.png",
       "target": [{ "target": "AppImage", "arch": ["x64"] }]
     }
   }
