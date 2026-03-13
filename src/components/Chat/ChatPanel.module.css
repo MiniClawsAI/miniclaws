@@ -3,30 +3,45 @@
   position: relative;
 }
 
-/* ── Expandable thread ─────────────────────────────────── */
+/* ── Floating thread panel ────────────────────────────────── */
 .thread {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  right: 0;
-  height: 0;
-  overflow: hidden;
-  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 70px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease-out, visibility 0.2s;
+}
+
+.threadOpen {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.threadPanel {
+  width: 90%;
+  max-width: 320px;
+  height: 360px;
   display: flex;
   flex-direction: column;
   background: rgba(18, 16, 32, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-radius: 20px 20px 0 0;
+  border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.08);
-  border-bottom: none;
   color: #e4e0ff;
   font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
-  z-index: 10;
+  animation: threadSlideUp 0.2s ease-out;
 }
 
-.threadOpen {
-  height: 340px;
+.thread:not(.threadOpen) .threadPanel {
+  animation: threadSlideDown 0.2s ease-in forwards;
 }
 
 .header {
@@ -51,7 +66,7 @@
   gap: 8px;
 }
 
-.clearBtn {
+.minimizeBtn {
   width: 22px;
   height: 22px;
   border-radius: 6px;
@@ -59,6 +74,25 @@
   border: 1px solid rgba(255,255,255,0.08);
   color: rgba(228, 224, 255, 0.4);
   font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.minimizeBtn:hover {
+  background: rgba(124, 108, 240, 0.3);
+  color: #a78bfa;
+}
+
+.clearBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(228, 224, 255, 0.4);
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -146,14 +180,14 @@
   align-items: flex-end;
   background: rgba(18, 16, 32, 1);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
+  border-radius: 100px;
   font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
 }
 
 .expandBtn {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: rgba(255,255,255,0.07);
   border: 1px solid rgba(255,255,255,0.1);
   color: rgba(200, 196, 255, 0.6);
@@ -174,7 +208,7 @@
   flex: 1;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
+  border-radius: 100px;
   color: #e4e0ff;
   font-size: 13px;
   padding: 6px 10px;
@@ -238,4 +272,14 @@
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
+}
+
+@keyframes threadSlideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes threadSlideDown {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(16px); opacity: 0; }
 }

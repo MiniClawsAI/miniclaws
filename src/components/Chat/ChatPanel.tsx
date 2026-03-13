@@ -105,72 +105,81 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
 
   return (
     <div className={styles.wrapper}>
-      {/* Expandable thread */}
-      <div className={`${styles.thread} ${threadOpen ? styles.threadOpen : ''}`}>
-        <div className={styles.header}>
-          <span className={styles.title}>✦ Companion</span>
-          <div className={styles.headerRight}>
-            {messages.length > 0 && (
+      {/* Floating thread panel */}
+      <div
+        className={`${styles.thread} ${threadOpen ? styles.threadOpen : ''}`}
+        onClick={(e) => { if (e.target === e.currentTarget) onToggleThread() }}
+      >
+        <div className={styles.threadPanel}>
+          <div className={styles.header}>
+            <span className={styles.title}>✦ Companion</span>
+            <div className={styles.headerRight}>
               <button
-                className={styles.clearBtn}
-                onClick={() => {
-                  clearMessages()
-                  setSpeechText('')
-                }}
-                title="Clear conversation"
-                disabled={isStreaming}
+                className={styles.minimizeBtn}
+                onClick={onToggleThread}
+                title="Minimize thread"
               >
-                ✕
+                ─
               </button>
-            )}
-            <div className={styles.dot} />
+              {messages.length > 0 && (
+                <button
+                  className={styles.clearBtn}
+                  onClick={() => {
+                    clearMessages()
+                    setSpeechText('')
+                  }}
+                  title="Delete conversation"
+                  disabled={isStreaming}
+                >
+                  🗑
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className={styles.messages}>
-          {messages.length === 0 && (
-            <div className={styles.empty}>
-              No messages yet — type below to start chatting
-            </div>
-          )}
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`${styles.msg} ${msg.role === 'user' ? styles.user : styles.assistant}`}
-            >
-              <div className={styles.bubble}>{msg.content}</div>
-            </div>
-          ))}
-          {toolStatus && !streamingText && (
-            <div className={`${styles.msg} ${styles.assistant}`}>
-              <div className={`${styles.bubble} ${styles.toolStatus}`}>
-                🔍 {toolStatus}
+          <div className={styles.messages}>
+            {messages.length === 0 && (
+              <div className={styles.empty}>
+                No messages yet — type below to start chatting
               </div>
-            </div>
-          )}
-          {streamingText && (
-            <div className={`${styles.msg} ${styles.assistant}`}>
-              <div className={styles.bubble}>
-                {streamingText}
-                <span className={styles.cursor}>▋</span>
+            )}
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`${styles.msg} ${msg.role === 'user' ? styles.user : styles.assistant}`}
+              >
+                <div className={styles.bubble}>{msg.content}</div>
               </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
+            ))}
+            {toolStatus && !streamingText && (
+              <div className={`${styles.msg} ${styles.assistant}`}>
+                <div className={`${styles.bubble} ${styles.toolStatus}`}>
+                  🔍 {toolStatus}
+                </div>
+              </div>
+            )}
+            {streamingText && (
+              <div className={`${styles.msg} ${styles.assistant}`}>
+                <div className={styles.bubble}>
+                  {streamingText}
+                  <span className={styles.cursor}>▋</span>
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
         </div>
       </div>
 
       {/* Input bar — always visible */}
       <div className={styles.inputBar}>
-        {(hasMessages || threadOpen) && (
-          <button
-            className={styles.expandBtn}
-            onClick={onToggleThread}
-            title={threadOpen ? 'Collapse thread' : 'Expand thread'}
-          >
-            {threadOpen ? '▾' : '▴'}
-          </button>
-        )}
+        <button
+          className={styles.expandBtn}
+          onClick={onToggleThread}
+          title={threadOpen ? 'Collapse thread' : 'Expand thread'}
+        >
+          <span style={{ display: 'inline-block', transform: threadOpen ? 'none' : 'rotate(180deg)', transition: 'transform 0.2s' }}>▾</span>
+        </button>
         <textarea
           ref={inputRef}
           className={styles.input}

@@ -65,12 +65,6 @@ export function LobsterChar({ emotion, isTalking, appearance }: LobsterCharProps
           <meshStandardMaterial color={shell} roughness={0.35} metalness={0.08} />
         </mesh>
 
-        {/* Belly highlight (front) */}
-        <mesh position={[0, -0.06, 0.2]}>
-          <sphereGeometry args={[0.16, 16, 16]} />
-          <meshStandardMaterial color={belly} roughness={0.5} />
-        </mesh>
-
         {/* ── Eyes — big, directly on face ────────────── */}
         {/* Left eye white */}
         <mesh ref={eyeL} position={[-0.09, 0.06, 0.24]}>
@@ -131,9 +125,9 @@ export function LobsterChar({ emotion, isTalking, appearance }: LobsterCharProps
         </group>
 
         {/* ── Mouth ──────────────────────────────────── */}
-        <mesh ref={mouth} position={[0, -0.08, 0.27]}>
-          <capsuleGeometry args={[0.012, 0.025, 4, 8]} />
-          <meshStandardMaterial color={appearance.mouth} roughness={0.5} />
+        <mesh ref={mouth} position={[0, -0.08, 0.29]} rotation={[0, 0, Math.PI / 2]}>
+          <capsuleGeometry args={[0.022, 0.05, 4, 8]} />
+          <meshStandardMaterial color="#2a0808" roughness={0.5} />
         </mesh>
 
         {/* Cheek blush */}
@@ -147,18 +141,50 @@ export function LobsterChar({ emotion, isTalking, appearance }: LobsterCharProps
         </mesh>
       </group>
 
-      {/* ── Arms — small round claws on the sides ────── */}
-      {/* Left arm */}
-      <group ref={armL} position={[-0.28, -0.04, 0.04]}>
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[0.065, 12, 12]} />
+      {/* ── Arms — claws on the sides ────────────────── */}
+      {/* Left arm — pivot at shoulder, arcs down */}
+      <group ref={armL} position={[-0.26, 0.02, 0.1]}>
+        {/* Upper arm */}
+        <mesh position={[-0.07, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <capsuleGeometry args={[0.028, 0.12, 4, 8]} />
+          <meshStandardMaterial color={shell} roughness={0.4} />
+        </mesh>
+        {/* Claw base — round palm */}
+        <mesh position={[-0.16, 0, 0]}>
+          <sphereGeometry args={[0.045, 10, 10]} />
+          <meshStandardMaterial color={claw} roughness={0.35} metalness={0.08} />
+        </mesh>
+        {/* Top finger — curved tapered cone pointing inward */}
+        <mesh position={[-0.22, 0.035, 0.0]} rotation={[0, 0, 0.7]} scale={[1, 0.45, 0.6]}>
+          <capsuleGeometry args={[0.03, 0.06, 4, 8]} />
+          <meshStandardMaterial color={claw} roughness={0.35} metalness={0.08} />
+        </mesh>
+        {/* Bottom finger — curved tapered */}
+        <mesh position={[-0.22, -0.03, 0.0]} rotation={[0, 0, -0.6]} scale={[1, 0.45, 0.6]}>
+          <capsuleGeometry args={[0.028, 0.055, 4, 8]} />
           <meshStandardMaterial color={claw} roughness={0.35} metalness={0.08} />
         </mesh>
       </group>
-      {/* Right arm */}
-      <group ref={armR} position={[0.28, -0.04, 0.04]}>
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[0.065, 12, 12]} />
+      {/* Right arm — pivot at shoulder, arcs down */}
+      <group ref={armR} position={[0.26, 0.02, 0.1]}>
+        {/* Upper arm */}
+        <mesh position={[0.07, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <capsuleGeometry args={[0.028, 0.12, 4, 8]} />
+          <meshStandardMaterial color={shell} roughness={0.4} />
+        </mesh>
+        {/* Claw base — round palm */}
+        <mesh position={[0.16, 0, 0]}>
+          <sphereGeometry args={[0.045, 10, 10]} />
+          <meshStandardMaterial color={claw} roughness={0.35} metalness={0.08} />
+        </mesh>
+        {/* Top finger — curved tapered */}
+        <mesh position={[0.22, 0.035, 0.0]} rotation={[0, 0, -0.7]} scale={[1, 0.45, 0.6]}>
+          <capsuleGeometry args={[0.03, 0.06, 4, 8]} />
+          <meshStandardMaterial color={claw} roughness={0.35} metalness={0.08} />
+        </mesh>
+        {/* Bottom finger — curved tapered */}
+        <mesh position={[0.22, -0.03, 0.0]} rotation={[0, 0, 0.6]} scale={[1, 0.45, 0.6]}>
+          <capsuleGeometry args={[0.028, 0.055, 4, 8]} />
           <meshStandardMaterial color={claw} roughness={0.35} metalness={0.08} />
         </mesh>
       </group>

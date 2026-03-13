@@ -147,14 +147,14 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     // Arm swing — smoothly gesture more when talking
     const armSwing = 0.04 + tb * 0.08
     if (refs.armL?.current) {
-      refs.armL.current.rotation.z = -0.15 + Math.sin(time * 0.9) * armSwing
-      if (emotion === 'wave') refs.armL.current.rotation.z = -0.15
+      refs.armL.current.rotation.z = 0.6 + Math.sin(time * 0.9) * armSwing
+      if (emotion === 'wave') refs.armL.current.rotation.z = 0.6
     }
     if (refs.armR?.current) {
       if (emotion === 'wave') {
         refs.armR.current.rotation.z = -0.8 - Math.sin(time * 4) * 0.3
       } else {
-        refs.armR.current.rotation.z = 0.15 + Math.sin(time * 0.9 + 1) * armSwing
+        refs.armR.current.rotation.z = -0.6 + Math.sin(time * 0.9 + 1) * armSwing
       }
     }
     const forearmSwing = 0.05 + tb * 0.1

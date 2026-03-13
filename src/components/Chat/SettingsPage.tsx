@@ -54,19 +54,21 @@ export function SettingsPage() {
 
         <div className={styles.field}>
           <label>Provider</label>
-          <select
-            value={local.provider}
-            onChange={(e) => {
-              const provider = e.target.value as any
-              const models = MODELS[provider]
-              setLocal({ ...local, provider, model: models ? models[0].value : '' })
-            }}
-          >
-            <option value="anthropic">Anthropic (Claude)</option>
-            <option value="openai">OpenAI</option>
-            <option value="gemini">Google (Gemini)</option>
-            <option value="ollama">Ollama (local)</option>
-          </select>
+          <div className={styles.selectWrap}>
+            <select
+              value={local.provider}
+              onChange={(e) => {
+                const provider = e.target.value as any
+                const models = MODELS[provider]
+                setLocal({ ...local, provider, model: models ? models[0].value : '' })
+              }}
+            >
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI</option>
+              <option value="gemini">Google (Gemini)</option>
+              <option value="ollama">Ollama (local)</option>
+            </select>
+          </div>
         </div>
 
         <div className={styles.field}>
@@ -87,14 +89,16 @@ export function SettingsPage() {
         <div className={styles.field}>
           <label>Model</label>
           {MODELS[local.provider] ? (
-            <select
-              value={validModel(local.provider, local.model)}
-              onChange={(e) => setLocal({ ...local, model: e.target.value })}
-            >
-              {MODELS[local.provider].map((m) => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
-            </select>
+            <div className={styles.selectWrap}>
+              <select
+                value={validModel(local.provider, local.model)}
+                onChange={(e) => setLocal({ ...local, model: e.target.value })}
+              >
+                {MODELS[local.provider].map((m) => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </div>
           ) : (
             <input
               type="text"

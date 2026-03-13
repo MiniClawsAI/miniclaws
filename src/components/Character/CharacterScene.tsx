@@ -14,7 +14,7 @@ function CameraZoom() {
     camera.position.z = 2.2
     camera.position.y = 0.05
     camera.updateProjectionMatrix()
-  }, camera)
+  }, [camera])
   return null
 }
 
