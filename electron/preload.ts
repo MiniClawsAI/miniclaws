@@ -60,6 +60,24 @@ contextBridge.exposeInMainWorld('electron', {
   // ── External links ─────────────────────────────────────
   openExternal: (url: string) => {
     ipcRenderer.send('open-external', url)
+  },
+
+  // ── 3D model import ───────────────────────────────────
+  openModelDialog: (): Promise<string | null> => {
+    return ipcRenderer.invoke('dialog:open-model')
+  },
+  showCharacterMenu: (): Promise<'import' | 'reset' | null> => {
+    return ipcRenderer.invoke('character:context-menu')
+  },
+
+  // ── Character editor ──────────────────────────────────
+  useCharacter: (path: string) => {
+    ipcRenderer.send('character:use-model', path)
+  },
+  onUseCharacter: (cb: (path: string) => void) => {
+    const handler = (_: unknown, path: string) => cb(path)
+    ipcRenderer.on('use-character', handler)
+    return () => ipcRenderer.removeListener('use-character', handler)
   }
 })
 
@@ -81,6 +99,10 @@ declare global {
       onToolStatus: (cb: (status: string) => void) => () => void
       onSettingsChanged: (cb: () => void) => () => void
       openExternal: (url: string) => void
+      openModelDialog: () => Promise<string | null>
+      showCharacterMenu: () => Promise<'import' | 'reset' | null>
+      useCharacter: (path: string) => void
+      onUseCharacter: (cb: (path: string) => void) => () => void
     }
   }
 }

@@ -2,7 +2,7 @@ import { Suspense, useRef, useCallback, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useStore } from '../../store'
 import { getCharacter } from '../../characters'
-import { VRMAvatar } from './VRMAvatar'
+import { ModelAvatar } from './ModelAvatar'
 import { CharacterRenderer } from './CharacterRenderer'
 import { SpeechBubble } from './SpeechBubble'
 import styles from './CharacterScene.module.css'
@@ -20,6 +20,7 @@ function CameraZoom() {
 export function CharacterScene() {
   const {
     vrmPath,
+    setVrmPath,
     emotion,
     isStreaming,
     speechText,
@@ -84,7 +85,16 @@ export function CharacterScene() {
         className={styles.canvas}
         onPointerDown={onPointerDown}
         onClick={onClick}
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={async (e) => {
+          e.preventDefault()
+          const action = await window.electron.showCharacterMenu()
+          if (action === 'import') {
+            const path = await window.electron.openModelDialog()
+            if (path) setVrmPath(path)
+          } else if (action === 'reset') {
+            setVrmPath(null)
+          }
+        }}
         style={{ cursor: 'grab' }}
       >
         <Canvas
@@ -101,7 +111,7 @@ export function CharacterScene() {
 
           <Suspense fallback={null}>
             {vrmPath ? (
-              <VRMAvatar
+              <ModelAvatar
                 url={vrmPath}
                 emotion={emotion}
                 isTalking={isStreaming}

@@ -158,12 +158,12 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
           </div>
 
           <div className={styles.messages}>
-            {messages.length === 0 && (
+            {messages.filter((m) => !m.hidden).length === 0 && (
               <div className={styles.empty}>
                 No messages yet — type below to start chatting
               </div>
             )}
-            {messages.map((msg, i) => (
+            {messages.filter((m) => !m.hidden).map((msg, i) => (
               <div
                 key={i}
                 className={`${styles.msg} ${msg.role === 'user' ? styles.user : styles.assistant}`}

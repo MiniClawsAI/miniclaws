@@ -14,9 +14,42 @@ export default function App() {
     return window.electron.onSuppressHover(setSuppressHover)
   }, [])
 
-  // Reload store when settings window closes
+  // Reload store when settings window closes — notify character of changes
   useEffect(() => {
-    return window.electron.onSettingsChanged(() => rehydrateStore())
+    return window.electron.onSettingsChanged(() => {
+      rehydrateStore()
+
+      const store = useStore.getState()
+      const { setEmotion, setSpeechText, addMessage } = store
+      const config = store.aiConfig
+
+      // Visual feedback
+      setEmotion('happy')
+      setSpeechText('Settings updated!')
+      setTimeout(() => { setEmotion('idle'); setSpeechText('') }, 3000)
+
+      // Inject hidden config summary so AI knows settings changed (no API keys!)
+      const enabledTools = [
+        config.webSearchEnabled && 'web_search',
+        config.openAppEnabled && 'open_app',
+        config.seeScreenEnabled && 'see_screen',
+        config.mapsEnabled && 'maps',
+        config.browseEnabled && 'browse'
+      ].filter(Boolean).join(', ') || 'none'
+
+      addMessage({
+        role: 'user',
+        content: `[System: Configuration updated — Provider: ${config.provider}, Model: ${config.model || 'default'}, Tools enabled: ${enabledTools}. Acknowledge briefly if the user asks about your setup.]`,
+        hidden: true
+      })
+    })
+  }, [])
+
+  // Apply character from editor window
+  useEffect(() => {
+    return window.electron.onUseCharacter((path) => {
+      useStore.getState().setVrmPath(path)
+    })
   }, [])
 
   return (

@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, nativeImage } from 'electron'
+import { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, nativeImage, dialog, protocol, net } from 'electron'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import { is } from '@electron-toolkit/utils'
 import { setupAIHandlers } from './ipc/ai'
 import { initToolRegistry } from './ipc/tool-registry'
@@ -12,6 +13,7 @@ import { setMainWindow } from './ipc/system-api'
 
 let mainWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
+let editorWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 
 function createWindow(): void {
@@ -97,9 +99,67 @@ function createWindow(): void {
     }
   })
 
+  // IPC: open 3D model file dialog
+  ipcMain.handle('dialog:open-model', async () => {
+    const result = await dialog.showOpenDialog({
+      title: 'Import 3D Model',
+      filters: [
+        { name: '3D Models', extensions: ['vrm', 'fbx', 'glb', 'gltf'] }
+      ],
+      properties: ['openFile']
+    })
+    if (result.canceled || result.filePaths.length === 0) return null
+    return result.filePaths[0]
+  })
+
+  // IPC: character right-click context menu
+  ipcMain.handle('character:context-menu', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (!win) return null
+
+    return new Promise<'import' | 'reset' | null>((resolve) => {
+      let resolved = false
+      const done = (val: 'import' | 'reset' | null) => {
+        if (resolved) return
+        resolved = true
+        resolve(val)
+      }
+      const menu = Menu.buildFromTemplate([
+        {
+          label: 'Import 3D Model…',
+          click: () => done('import')
+        },
+        {
+          label: 'Reset to Default Character',
+          click: () => done('reset')
+        },
+        { type: 'separator' },
+        {
+          label: 'Character Editor',
+          click: () => {
+            openEditorWindow()
+            done(null)
+          }
+        }
+      ])
+      menu.popup({
+        window: win,
+        callback: () => {
+          // Called after menu is closed — delay to let click fire first
+          setTimeout(() => done(null), 200)
+        }
+      })
+    })
+  })
+
   // IPC: open settings in separate window
   ipcMain.on('open-settings', () => {
     openSettingsWindow()
+  })
+
+  // IPC: use character from editor — forward model path to main window
+  ipcMain.on('character:use-model', (_e, path: string) => {
+    mainWindow?.webContents.send('use-character', path)
   })
 
   // IPC: minimize — fade out then hide
@@ -191,6 +251,38 @@ function openSettingsWindow(): void {
   })
 }
 
+function openEditorWindow(): void {
+  if (editorWindow && !editorWindow.isDestroyed()) {
+    editorWindow.focus()
+    return
+  }
+
+  const editorIcon = nativeImage.createFromPath(join(__dirname, '../../resources/icon.png'))
+  editorWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    resizable: true,
+    frame: true,
+    transparent: false,
+    title: 'MiniClaws Character Editor',
+    icon: editorIcon,
+    backgroundColor: '#080b10',
+    webPreferences: {
+      preload: join(__dirname, '../preload/editor-preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    }
+  })
+
+  editorWindow.setMenuBarVisibility(false)
+  editorWindow.loadFile(join(__dirname, '../../resources/editor/vrm-viewer.html'))
+
+  editorWindow.on('closed', () => {
+    editorWindow = null
+  })
+}
+
 function createTray(): void {
   // Use the lobster icon from resources
   const iconPath = join(__dirname, '../../resources/icon.png')
@@ -203,6 +295,10 @@ function createTray(): void {
     {
       label: 'Show MiniClaws',
       click: () => restoreWindow()
+    },
+    {
+      label: 'Character Editor',
+      click: () => openEditorWindow()
     },
     { type: 'separator' },
     {
@@ -218,7 +314,19 @@ function createTray(): void {
   tray.on('click', () => restoreWindow())
 }
 
+// Register custom protocol for loading local 3D model files
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'local-model', privileges: { bypassCSP: true, supportFetchAPI: true, stream: true } }
+])
+
 app.whenReady().then(() => {
+  // Handle local-model:// protocol — serves local files safely
+  protocol.handle('local-model', (request) => {
+    // URL comes in as local-model:///absolute/path/to/file.fbx
+    const filePath = decodeURIComponent(request.url.replace('local-model://', ''))
+    return net.fetch(pathToFileURL(filePath).href)
+  })
+
   // Initialize tool registry and register built-in tools
   const registry = initToolRegistry()
   registry.register(webSearchTool)

@@ -18,7 +18,10 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
-        input: { index: resolve('electron/preload.ts') }
+        input: {
+          index: resolve('electron/preload.ts'),
+          'editor-preload': resolve('electron/editor-preload.ts')
+        }
       }
     }
   },

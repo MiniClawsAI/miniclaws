@@ -29,6 +29,7 @@ export interface AIConfig {
 export interface Message {
   role: 'user' | 'assistant' | 'tool'
   content: string
+  hidden?: boolean
 }
 
 const DEFAULT_SYSTEM = `You are MiniClaws, a friendly 3D desktop companion character.
