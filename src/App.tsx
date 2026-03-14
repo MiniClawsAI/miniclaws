@@ -80,7 +80,11 @@ export default function App() {
   }, [])
 
   return (
-    <div className={`${styles.root} ${suppressHover ? styles.suppressHover : ''} ${(threadOpen || inputFocused) ? styles.chatPinned : ''}`}>
+    <div
+      className={`${styles.root} ${suppressHover ? styles.suppressHover : ''} ${(threadOpen || inputFocused) ? styles.chatPinned : ''}`}
+      onMouseEnter={() => window.electron.setIgnoreMouse(false)}
+      onMouseLeave={() => window.electron.setIgnoreMouse(true)}
+    >
       {/* Character always visible in top portion */}
       <div className={styles.character}>
         <CharacterScene />

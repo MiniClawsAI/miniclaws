@@ -53,8 +53,8 @@ function createWindow(): void {
     app.dock?.hide()
   }
 
-  // Allow clicking through transparent areas
-  mainWindow.setIgnoreMouseEvents(false)
+  // Default: click-through transparent areas; renderer toggles on mouseenter/leave
+  mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
