@@ -66,7 +66,7 @@ contextBridge.exposeInMainWorld('electron', {
   openModelDialog: (): Promise<string | null> => {
     return ipcRenderer.invoke('dialog:open-model')
   },
-  showCharacterMenu: (): Promise<'import' | 'reset' | null> => {
+  showCharacterMenu: (): Promise<'editor' | 'reset' | null> => {
     return ipcRenderer.invoke('character:context-menu')
   },
 
@@ -100,7 +100,7 @@ declare global {
       onSettingsChanged: (cb: () => void) => () => void
       openExternal: (url: string) => void
       openModelDialog: () => Promise<string | null>
-      showCharacterMenu: () => Promise<'import' | 'reset' | null>
+      showCharacterMenu: () => Promise<'editor' | 'reset' | null>
       useCharacter: (path: string) => void
       onUseCharacter: (cb: (path: string) => void) => () => void
     }

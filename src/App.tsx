@@ -27,19 +27,24 @@ export default function App() {
     }
   }, [])
 
-  // Reload store when settings window closes — notify character of changes
+  // Reload store when settings window closes — only react if config actually changed
   useEffect(() => {
     return window.electron.onSettingsChanged(() => {
+      const beforeConfig = JSON.stringify(useStore.getState().aiConfig)
       rehydrateStore()
+      const afterConfig = JSON.stringify(useStore.getState().aiConfig)
+
+      // Only react if settings actually changed
+      if (beforeConfig === afterConfig) return
 
       const store = useStore.getState()
       const { setEmotion, setSpeechText, addMessage } = store
       const config = store.aiConfig
 
-      // Visual feedback
+      // Friendly visual feedback
       setEmotion('happy')
-      setSpeechText('Settings updated!')
-      setTimeout(() => { setEmotion('idle'); setSpeechText('') }, 3000)
+      setSpeechText('Got it! I\'m all set with the new settings ✨')
+      setTimeout(() => { setEmotion('idle'); setSpeechText('') }, 4000)
 
       // Inject hidden config summary so AI knows settings changed (no API keys!)
       const enabledTools = [

@@ -117,29 +117,24 @@ function createWindow(): void {
     const win = BrowserWindow.fromWebContents(event.sender)
     if (!win) return null
 
-    return new Promise<'import' | 'reset' | null>((resolve) => {
+    return new Promise<'editor' | 'reset' | null>((resolve) => {
       let resolved = false
-      const done = (val: 'import' | 'reset' | null) => {
+      const done = (val: 'editor' | 'reset' | null) => {
         if (resolved) return
         resolved = true
         resolve(val)
       }
       const menu = Menu.buildFromTemplate([
         {
-          label: 'Import 3D Model…',
-          click: () => done('import')
-        },
-        {
-          label: 'Reset to Default Character',
-          click: () => done('reset')
-        },
-        { type: 'separator' },
-        {
-          label: 'Character Editor',
+          label: 'Character Editor…',
           click: () => {
             openEditorWindow()
             done(null)
           }
+        },
+        {
+          label: 'Reset to Default Character',
+          click: () => done('reset')
         }
       ])
       menu.popup({

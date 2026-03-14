@@ -30,11 +30,23 @@
   line-height: 1.5;
   color: #2d2d3d;
   word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.contentStreaming {
+  font-family: 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2d2d3d;
+  word-break: break-word;
   max-height: 80px;
   overflow-y: auto;
   scrollbar-width: none;
 }
-.content::-webkit-scrollbar { display: none; }
+.contentStreaming::-webkit-scrollbar { display: none; }
 
 .cursor {
   display: inline-block;

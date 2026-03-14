@@ -62,7 +62,7 @@ export function SpeechBubble({ text, isStreaming, onClose, onClick }: SpeechBubb
       }}
       style={{ cursor: onClick ? 'pointer' : undefined }}
     >
-      <div ref={contentRef} className={styles.content}>
+      <div ref={contentRef} className={isStreaming ? styles.contentStreaming : styles.content}>
         {isThinking ? (
           <span className={styles.thinking}>
             <span className={styles.dot} />

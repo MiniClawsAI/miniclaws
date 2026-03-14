@@ -88,10 +88,7 @@ export function CharacterScene() {
         onContextMenu={async (e) => {
           e.preventDefault()
           const action = await window.electron.showCharacterMenu()
-          if (action === 'import') {
-            const path = await window.electron.openModelDialog()
-            if (path) setVrmPath(path)
-          } else if (action === 'reset') {
+          if (action === 'reset') {
             setVrmPath(null)
           }
         }}
