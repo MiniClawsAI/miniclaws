@@ -63,6 +63,15 @@ export default function App() {
     })
   }, [])
 
+  // Greet user on initial load
+  useEffect(() => {
+    const { setEmotion, setSpeechText } = useStore.getState()
+    setEmotion('wave')
+    setSpeechText('Hey there 🦞! What can I help you with?')
+    setTimeout(() => { setEmotion('happy') }, 2000)
+    setTimeout(() => { setEmotion('idle'); setSpeechText('') }, 5000)
+  }, [])
+
   // Apply character from editor window
   useEffect(() => {
     return window.electron.onUseCharacter((path) => {

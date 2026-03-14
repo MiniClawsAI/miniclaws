@@ -23,4 +23,5 @@
   width: 100%;
   flex: 1;
   user-select: none;
+  cursor: grab;
 }

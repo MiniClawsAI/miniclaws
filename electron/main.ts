@@ -73,18 +73,66 @@ function createWindow(): void {
     mainWindow?.setIgnoreMouseEvents(ignore, { forward: true })
   })
 
-  // IPC: drag the frameless window
-  ipcMain.on('window-drag-start', () => {
-    // handled via CSS -webkit-app-region: drag on the character
+  // IPC: smooth drag — recursive setTimeout + time-based exponential smoothing
+  let dragging = false
+  let dragOffset = { dx: 0, dy: 0 }
+  let currentPos = { x: 0, y: 0 }
+  let lastDragTime = 0
+  let dragTimer: ReturnType<typeof setTimeout> | null = null
+
+  const DRAG_SMOOTHING = 10 // higher = snappier, lower = more floaty
+
+  function animateDrag() {
+    if (!dragging || !mainWindow) return
+
+    const now = Date.now()
+    const dt = Math.min((now - lastDragTime) / 1000, 0.05) // cap at 50ms to prevent jumps
+    lastDragTime = now
+
+    const cursor = screen.getCursorScreenPoint()
+    const targetX = cursor.x + dragOffset.dx
+    const targetY = cursor.y + dragOffset.dy
+
+    // Time-based exponential smoothing — consistent regardless of frame timing
+    const t = 1 - Math.exp(-DRAG_SMOOTHING * dt)
+    currentPos.x += (targetX - currentPos.x) * t
+    currentPos.y += (targetY - currentPos.y) * t
+
+    const rx = Math.round(currentPos.x)
+    const ry = Math.round(currentPos.y)
+
+    mainWindow.setPosition(rx, ry, false)
+
+    // Schedule next frame only after this one completes (prevents pile-up)
+    dragTimer = setTimeout(animateDrag, 16)
+  }
+
+  ipcMain.on('drag-start', (_e, { screenX, screenY }: { screenX: number; screenY: number }) => {
+    if (!mainWindow || dragging) return
+    const [wx, wy] = mainWindow.getPosition()
+    dragOffset = { dx: wx - screenX, dy: wy - screenY }
+    currentPos = { x: wx, y: wy }
+    lastDragTime = Date.now()
+    dragging = true
+    animateDrag()
   })
 
-  // IPC: move window to a position
-  ipcMain.on('move-window', (_e, { x, y }: { x: number; y: number }) => {
-    mainWindow?.setPosition(Math.round(x), Math.round(y), true)
+  ipcMain.on('drag-stop', () => {
+    dragging = false
+    if (dragTimer) {
+      clearTimeout(dragTimer)
+      dragTimer = null
+    }
+    // Snap to final cursor position
+    if (mainWindow) {
+      const cursor = screen.getCursorScreenPoint()
+      mainWindow.setPosition(
+        Math.round(cursor.x + dragOffset.dx),
+        Math.round(cursor.y + dragOffset.dy),
+        false
+      )
+    }
   })
-
-  // IPC: get window position
-  ipcMain.handle('get-window-pos', () => mainWindow?.getPosition())
 
   // IPC: get screen size
   ipcMain.handle('get-screen-size', () => {

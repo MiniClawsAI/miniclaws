@@ -32,23 +32,24 @@ export function CharacterScene() {
 
   const appearance = getCharacter(characterId)
 
-  // ── Dragging ───────────────────────────────────────────────
+  // ── Dragging — main process polls cursor + lerps for smooth follow ──
   const isDragging = useRef(false)
-  const dragStart  = useRef({ mx: 0, my: 0, wx: 0, wy: 0 })
+  const dragStartPos = useRef({ mx: 0, my: 0 })
 
-  const onPointerDown = useCallback(async (e: React.PointerEvent) => {
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.button !== 0) return
     isDragging.current = false
-    const [wx, wy] = await window.electron.getWindowPos()
-    dragStart.current = { mx: e.screenX, my: e.screenY, wx, wy }
+    dragStartPos.current = { mx: e.screenX, my: e.screenY }
+
+    window.electron.dragStart(e.screenX, e.screenY)
 
     const onMove = (ev: PointerEvent) => {
-      const dx = ev.screenX - dragStart.current.mx
-      const dy = ev.screenY - dragStart.current.my
+      const dx = ev.screenX - dragStartPos.current.mx
+      const dy = ev.screenY - dragStartPos.current.my
       if (Math.abs(dx) > 3 || Math.abs(dy) > 3) isDragging.current = true
-      window.electron.moveWindow(dragStart.current.wx + dx, dragStart.current.wy + dy)
     }
     const onUp = () => {
+      window.electron.dragStop()
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
     }
@@ -58,7 +59,6 @@ export function CharacterScene() {
 
   const onClick = useCallback(() => {
     if (isDragging.current) return
-    // Focus the input field without opening the thread
     setTimeout(() => window.dispatchEvent(new Event('miniclaws:focus-input')), 100)
   }, [])
 
@@ -92,7 +92,6 @@ export function CharacterScene() {
             setVrmPath(null)
           }
         }}
-        style={{ cursor: 'grab' }}
       >
         <Canvas
           gl={{ alpha: true, antialias: true }}

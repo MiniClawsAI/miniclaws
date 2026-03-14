@@ -26,11 +26,11 @@ contextBridge.exposeInMainWorld('electron', {
   setIgnoreMouse: (ignore: boolean) => {
     ipcRenderer.send('set-ignore-mouse', ignore)
   },
-  moveWindow: (x: number, y: number) => {
-    ipcRenderer.send('move-window', { x, y })
+  dragStart: (screenX: number, screenY: number) => {
+    ipcRenderer.send('drag-start', { screenX, screenY })
   },
-  getWindowPos: (): Promise<[number, number]> => {
-    return ipcRenderer.invoke('get-window-pos')
+  dragStop: () => {
+    ipcRenderer.send('drag-stop')
   },
   getScreenSize: (): Promise<{ width: number; height: number }> => {
     return ipcRenderer.invoke('get-screen-size')
@@ -90,8 +90,8 @@ declare global {
       onDone: (cb: () => void) => () => void
       onError: (cb: (err: string) => void) => () => void
       setIgnoreMouse: (ignore: boolean) => void
-      moveWindow: (x: number, y: number) => void
-      getWindowPos: () => Promise<[number, number]>
+      dragStart: (screenX: number, screenY: number) => void
+      dragStop: () => void
       getScreenSize: () => Promise<{ width: number; height: number }>
       minimizeWindow: () => void
       openSettings: () => void
