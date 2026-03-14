@@ -147,8 +147,27 @@ async function findAppMac(appName: string): Promise<string | null> {
   }
 }
 
+async function isAppRunningMac(appName: string): Promise<boolean> {
+  try {
+    const { stdout } = await execAsync(
+      `osascript -e 'tell application "System Events" to (name of processes) contains "${appName.replace(/"/g, '\\"')}"'`
+    )
+    return stdout.trim() === 'true'
+  } catch {
+    return false
+  }
+}
+
 async function openAppMac(appName: string): Promise<string> {
-  // Try `open -a` first — macOS resolves app names intelligently
+  // If already running, just bring to front
+  if (await isAppRunningMac(appName)) {
+    await execAsync(
+      `osascript -e 'tell application "${appName.replace(/"/g, '\\"')}" to activate'`
+    )
+    return `"${appName}" is already running — brought it to the front.`
+  }
+
+  // Not running — launch it
   try {
     await execAsync(`open -a "${appName.replace(/"/g, '\\"')}"`)
     return `Opened "${appName}" successfully.`
@@ -159,7 +178,7 @@ async function openAppMac(appName: string): Promise<string> {
       await execAsync(`open "${appPath.replace(/"/g, '\\"')}"`)
       return `Opened "${appName}" successfully.`
     }
-    throw new Error(`not_found`)
+    throw new Error('not_found')
   }
 }
 
@@ -301,7 +320,7 @@ export const openAppTool: RegisteredTool = {
   },
 
   permissions: {
-    process: { shell: false, spawn: ['open', 'mdfind', 'which', 'xdg-open', 'where', 'start'] },
+    process: { shell: false, spawn: ['open', 'mdfind', 'osascript', 'which', 'xdg-open', 'where', 'start'] },
     system: {}
   },
 
