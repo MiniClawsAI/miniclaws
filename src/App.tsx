@@ -67,7 +67,7 @@ export default function App() {
   useEffect(() => {
     const { setEmotion, setSpeechText } = useStore.getState()
     setEmotion('wave')
-    setSpeechText('Hey there 🦞! What can I help you with?')
+    setSpeechText('Hey there 👋! What can I help you with?')
     setTimeout(() => { setEmotion('happy') }, 2000)
     setTimeout(() => { setEmotion('idle'); setSpeechText('') }, 5000)
   }, [])

@@ -149,27 +149,33 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     }
 
     // Arm swing — smoothly gesture more when talking
+    // Direction multipliers: flip animation offsets for inverted arm orientations
+    // Humanoid: armRestL<0, armRestR>0 (arms hang down)
+    // Lobster:  armRestL>0, armRestR<0 (arms extend outward)
+    const dirL = -Math.sign(armRestL) || 1 // humanoid: 1, lobster: -1
+    const dirR = Math.sign(armRestR) || 1  // humanoid: 1, lobster: -1
+
     const armSwing = 0.04 + tb * 0.08
     if (refs.armL?.current) {
-      refs.armL.current.rotation.z = armRestL + Math.sin(time * 0.9) * armSwing
+      refs.armL.current.rotation.z = armRestL + dirL * Math.sin(time * 0.9) * armSwing
       if (emotion === 'wave') refs.armL.current.rotation.z = armRestL
     }
     if (refs.armR?.current) {
       if (emotion === 'wave') {
-        refs.armR.current.rotation.z = armRestR - 0.65 - Math.sin(time * 4) * 0.3
+        refs.armR.current.rotation.z = armRestR + dirR * (-0.65 - Math.sin(time * 4) * 0.3)
       } else {
-        refs.armR.current.rotation.z = armRestR + Math.sin(time * 0.9 + 1) * armSwing
+        refs.armR.current.rotation.z = armRestR + dirR * Math.sin(time * 0.9 + 1) * armSwing
       }
     }
     const forearmSwing = 0.05 + tb * 0.1
     if (refs.forearmL?.current) {
-      refs.forearmL.current.rotation.z = Math.sin(time * 0.7) * forearmSwing
+      refs.forearmL.current.rotation.z = dirL * Math.sin(time * 0.7) * forearmSwing
     }
     if (refs.forearmR?.current) {
       if (emotion === 'wave') {
-        refs.forearmR.current.rotation.z = -0.6 - Math.sin(time * 6) * 0.4
+        refs.forearmR.current.rotation.z = dirR * (-0.6 - Math.sin(time * 6) * 0.4)
       } else {
-        refs.forearmR.current.rotation.z = Math.sin(time * 0.7 + 1) * forearmSwing
+        refs.forearmR.current.rotation.z = dirR * Math.sin(time * 0.7 + 1) * forearmSwing
       }
     }
 
