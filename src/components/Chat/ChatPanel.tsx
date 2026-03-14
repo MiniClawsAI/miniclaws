@@ -44,6 +44,13 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     }
   }, [messages, streamingText, threadOpen])
 
+  // Focus input when character is clicked
+  useEffect(() => {
+    const handler = () => inputRef.current?.focus()
+    window.addEventListener('miniclaws:focus-input', handler)
+    return () => window.removeEventListener('miniclaws:focus-input', handler)
+  }, [])
+
   const needsSetup = useCallback(() => {
     const needsKey = aiConfig.provider !== 'ollama'
     return needsKey && !aiConfig.apiKey?.trim()
@@ -147,6 +154,8 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
                   onClick={() => {
                     clearMessages()
                     setSpeechText('')
+                    onToggleThread()
+                    setTimeout(() => inputRef.current?.focus(), 100)
                   }}
                   title="Delete conversation"
                   disabled={isStreaming}
@@ -207,6 +216,8 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
+          onFocus={() => window.dispatchEvent(new Event('miniclaws:input-focus'))}
+          onBlur={() => window.dispatchEvent(new Event('miniclaws:input-blur'))}
           rows={1}
           disabled={isStreaming}
         />

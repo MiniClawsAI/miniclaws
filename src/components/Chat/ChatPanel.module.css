@@ -40,8 +40,8 @@
   animation: threadSlideUp 0.2s ease-out;
 }
 
-.thread:not(.threadOpen) .threadPanel {
-  animation: threadSlideDown 0.2s ease-in forwards;
+.thread:not(.threadOpen) {
+  display: none;
 }
 
 .header {

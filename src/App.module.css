@@ -102,6 +102,7 @@
   transition: opacity 0.2s ease;
 }
 .root:hover .chatWrap { opacity: 1; transition-delay: 0.3s; }
+.chatPinned .chatWrap { opacity: 1; }
 .suppressHover .chatWrap,
 .suppressHover .settingsBtn,
 .suppressHover .pickerBtn,

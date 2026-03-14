@@ -9,9 +9,22 @@ export default function App() {
   const [showPicker, setShowPicker] = useState(false)
   const { isChatOpen: threadOpen, setChatOpen: setThreadOpen } = useStore()
   const [suppressHover, setSuppressHover] = useState(false)
+  const [inputFocused, setInputFocused] = useState(false)
 
   useEffect(() => {
     return window.electron.onSuppressHover(setSuppressHover)
+  }, [])
+
+  // Keep chat visible when input is focused
+  useEffect(() => {
+    const onFocus = () => setInputFocused(true)
+    const onBlur = () => setInputFocused(false)
+    window.addEventListener('miniclaws:input-focus', onFocus)
+    window.addEventListener('miniclaws:input-blur', onBlur)
+    return () => {
+      window.removeEventListener('miniclaws:input-focus', onFocus)
+      window.removeEventListener('miniclaws:input-blur', onBlur)
+    }
   }, [])
 
   // Reload store when settings window closes — notify character of changes
@@ -53,7 +66,7 @@ export default function App() {
   }, [])
 
   return (
-    <div className={`${styles.root} ${suppressHover ? styles.suppressHover : ''}`}>
+    <div className={`${styles.root} ${suppressHover ? styles.suppressHover : ''} ${(threadOpen || inputFocused) ? styles.chatPinned : ''}`}>
       {/* Character always visible in top portion */}
       <div className={styles.character}>
         <CharacterScene />

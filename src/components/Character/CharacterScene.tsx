@@ -58,8 +58,8 @@ export function CharacterScene() {
 
   const onClick = useCallback(() => {
     if (isDragging.current) return
-    // Character click is reserved for future interactions (wave, etc.)
-    // Chat thread is opened via the input bar expand button or speech bubble click
+    // Focus the input field without opening the thread
+    setTimeout(() => window.dispatchEvent(new Event('miniclaws:focus-input')), 100)
   }, [])
 
 
