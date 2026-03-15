@@ -46,7 +46,10 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
 
   // Focus input when character is clicked
   useEffect(() => {
-    const handler = () => inputRef.current?.focus()
+    const handler = () => {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }
     window.addEventListener('miniclaws:focus-input', handler)
     return () => window.removeEventListener('miniclaws:focus-input', handler)
   }, [])
@@ -230,7 +233,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
           onFocus={() => window.dispatchEvent(new Event('miniclaws:input-focus'))}
           onBlur={() => window.dispatchEvent(new Event('miniclaws:input-blur'))}
           rows={1}
-          disabled={isStreaming}
+          readOnly={isStreaming}
         />
         <button
           className={styles.send}

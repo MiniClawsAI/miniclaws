@@ -13,8 +13,10 @@ html, body, #root {
   user-select: none;
 }
 
-/* Allow text selection in chat */
-.chat-selectable {
+/* Allow text selection in chat and inputs */
+.chat-selectable,
+input,
+textarea {
   -webkit-user-select: text;
   user-select: text;
 }
