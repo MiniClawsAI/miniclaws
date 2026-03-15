@@ -1,5 +1,16 @@
-import { Suspense, useRef, useCallback, useEffect } from 'react'
+import { Suspense, useRef, useCallback, useEffect, useMemo } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
+
+/** Throttle rendering: 15fps idle, 60fps when active (talking/emoting) */
+function FrameThrottle({ active }: { active: boolean }) {
+  const { invalidate } = useThree()
+  useEffect(() => {
+    const fps = active ? 60 : 15
+    const id = setInterval(() => invalidate(), 1000 / fps)
+    return () => clearInterval(id)
+  }, [active, invalidate])
+  return null
+}
 import { useStore } from '../../store'
 import { getCharacter } from '../../characters'
 import { ModelAvatar } from './ModelAvatar'
@@ -94,12 +105,14 @@ export function CharacterScene() {
         }}
       >
         <Canvas
+          frameloop="demand"
           gl={{ alpha: true, antialias: true }}
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0)
           }}
           camera={{ position: [0, 0.2, 2.5], fov: 35 }}
         >
+          <FrameThrottle active={isStreaming || emotion !== 'idle'} />
           <CameraZoom isClippy={appearance.type === 'clippy'} />
           <ambientLight intensity={1.2} />
           <directionalLight position={[2, 4, 3]} intensity={1.5} castShadow />

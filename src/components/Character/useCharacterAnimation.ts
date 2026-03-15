@@ -79,6 +79,7 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     const time = t.current
     // Multiplier smoothly ramps 1→2 based on talk blend
     const mult = 1 + tb * 1.0
+    const isActive = tb > 0.01 || emotion !== 'idle'
 
     // Subtle idle sway — smoothly amplified when talking
     refs.groupRef.current.position.y = initialY.current + Math.sin(time * 0.8) * swayAmount * mult
@@ -90,16 +91,18 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
     refs.headRef.current.rotation.z = Math.sin(time * 0.35) * 0.04 * mult
     refs.headRef.current.rotation.x = Math.sin(time * 0.45) * 0.03 * mult
 
-    // Pupil tracking
-    const px = Math.sin(time * 0.6) * 0.008
-    const py = Math.sin(time * 0.8) * 0.005
-    if (refs.pupilL?.current) {
-      refs.pupilL.current.position.x = -pupilBaseX + px
-      refs.pupilL.current.position.y = pupilBaseY + py
-    }
-    if (refs.pupilR?.current) {
-      refs.pupilR.current.position.x = pupilBaseX + px
-      refs.pupilR.current.position.y = pupilBaseY + py
+    // Pupil tracking — skip when idle for CPU savings
+    if (isActive) {
+      const px = Math.sin(time * 0.6) * 0.008
+      const py = Math.sin(time * 0.8) * 0.005
+      if (refs.pupilL?.current) {
+        refs.pupilL.current.position.x = -pupilBaseX + px
+        refs.pupilL.current.position.y = pupilBaseY + py
+      }
+      if (refs.pupilR?.current) {
+        refs.pupilR.current.position.x = pupilBaseX + px
+        refs.pupilR.current.position.y = pupilBaseY + py
+      }
     }
 
     // Blink
@@ -167,24 +170,26 @@ export function useCharacterAnimation(refs: AnimationRefs, options: AnimationOpt
         refs.armR.current.rotation.z = armRestR + dirR * Math.sin(time * 0.9 + 1) * armSwing
       }
     }
-    const forearmSwing = 0.05 + tb * 0.1
-    if (refs.forearmL?.current) {
-      refs.forearmL.current.rotation.z = dirL * Math.sin(time * 0.7) * forearmSwing
-    }
-    if (refs.forearmR?.current) {
-      if (emotion === 'wave') {
-        refs.forearmR.current.rotation.z = dirR * (-0.6 - Math.sin(time * 6) * 0.4)
-      } else {
-        refs.forearmR.current.rotation.z = dirR * Math.sin(time * 0.7 + 1) * forearmSwing
+    // Forearms + legs — skip when idle for CPU savings
+    if (isActive) {
+      const forearmSwing = 0.05 + tb * 0.1
+      if (refs.forearmL?.current) {
+        refs.forearmL.current.rotation.z = dirL * Math.sin(time * 0.7) * forearmSwing
       }
-    }
+      if (refs.forearmR?.current) {
+        if (emotion === 'wave') {
+          refs.forearmR.current.rotation.z = dirR * (-0.6 - Math.sin(time * 6) * 0.4)
+        } else {
+          refs.forearmR.current.rotation.z = dirR * Math.sin(time * 0.7 + 1) * forearmSwing
+        }
+      }
 
-    // Leg subtle shift
-    if (refs.legL?.current) {
-      refs.legL.current.rotation.x = Math.sin(time * 0.5) * 0.02
-    }
-    if (refs.legR?.current) {
-      refs.legR.current.rotation.x = Math.sin(time * 0.5 + Math.PI) * 0.02
+      if (refs.legL?.current) {
+        refs.legL.current.rotation.x = Math.sin(time * 0.5) * 0.02
+      }
+      if (refs.legR?.current) {
+        refs.legR.current.rotation.x = Math.sin(time * 0.5 + Math.PI) * 0.02
+      }
     }
   })
 
