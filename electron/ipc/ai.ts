@@ -613,7 +613,13 @@ export function setupAIHandlers(): void {
             )
           ]
 
-          // Loop back — the LLM will now respond with the search results
+          // Send tool context back to renderer for persistence across turns
+          const contextSummary = typeof toolResult === 'string'
+            ? `[Tool: ${collectedToolCall.name}] ${toolResult}`
+            : `[Tool: ${collectedToolCall.name}] Captured screenshot (${toolResult.text || 'image'})`
+          event.sender.send('ai:tool_context', contextSummary)
+
+          // Loop back — the LLM will now respond with the results
         }
 
         event.sender.send('ai:done')

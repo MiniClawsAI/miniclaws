@@ -118,7 +118,11 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       inputRef.current?.focus()
     })
 
-    cleanups.current = [offChunk, offDone, offErr]
+    const offToolCtx = window.electron.onToolContext((ctx) => {
+      addMessage({ role: 'assistant', content: ctx, hidden: true })
+    })
+
+    cleanups.current = [offChunk, offDone, offErr, offToolCtx]
   }, [input, isStreaming, messages, aiConfig, addMessage, setStreaming, clearStreamText, appendStreamText, setEmotion, setSpeechText, needsSetup])
 
   const onKeyDown = (e: React.KeyboardEvent) => {

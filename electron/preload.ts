@@ -78,6 +78,11 @@ contextBridge.exposeInMainWorld('electron', {
     const handler = (_: unknown, path: string) => cb(path)
     ipcRenderer.on('use-character', handler)
     return () => ipcRenderer.removeListener('use-character', handler)
+  },
+  onToolContext: (cb: (ctx: string) => void) => {
+    const handler = (_: unknown, ctx: string) => cb(ctx)
+    ipcRenderer.on('ai:tool_context', handler)
+    return () => ipcRenderer.removeListener('ai:tool_context', handler)
   }
 })
 
@@ -103,6 +108,7 @@ declare global {
       showCharacterMenu: () => Promise<'editor' | 'reset' | null>
       useCharacter: (path: string) => void
       onUseCharacter: (cb: (path: string) => void) => () => void
+      onToolContext: (cb: (ctx: string) => void) => () => void
     }
   }
 }
