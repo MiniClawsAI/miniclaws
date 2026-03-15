@@ -140,6 +140,11 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
       e.preventDefault()
       sendMessage()
     }
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      inputRef.current?.blur()
+      if (threadOpen) onToggleThread()
+    }
   }
 
   const hasMessages = messages.length > 0 || !!streamingText
