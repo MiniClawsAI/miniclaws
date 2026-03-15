@@ -9,6 +9,8 @@ import { openAppTool } from './ipc/tools/open-app.tool'
 import { seeScreenTool } from './ipc/tools/see-screen.tool'
 import { mapsTool } from './ipc/tools/maps.tool'
 import { browseTool } from './ipc/tools/browse.tool'
+import { readMessagesTool } from './ipc/tools/read-messages.tool'
+import { runShortcutTool } from './ipc/tools/run-shortcut.tool'
 import { setMainWindow } from './ipc/system-api'
 
 let mainWindow: BrowserWindow | null = null
@@ -388,6 +390,8 @@ app.whenReady().then(() => {
   registry.register(seeScreenTool)
   registry.register(mapsTool)
   registry.register(browseTool)
+  registry.register(readMessagesTool)
+  registry.register(runShortcutTool)
 
   setupAIHandlers()
   createWindow()

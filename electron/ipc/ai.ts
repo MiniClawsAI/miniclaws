@@ -23,6 +23,8 @@ export interface AIConfig {
   mapsEnabled?: boolean
   mapsProvider?: string
   browseEnabled?: boolean
+  messagesEnabled?: boolean
+  shortcutsEnabled?: boolean
   tavilyApiKey?: string
 }
 
@@ -34,7 +36,10 @@ export interface Message {
 
 const DEFAULT_SYSTEM = `You are MiniClaws, a friendly 3D desktop companion character.
 You're helpful, witty, and concise. You live on the user's desktop and assist them.
-Keep responses short and conversational - 1-3 sentences unless asked for more.`
+Keep responses short and conversational - 1-3 sentences unless asked for more.
+You are a personal assistant app installed on the user's own computer. The user has full control over which tools are enabled.
+When a tool is enabled, the user has explicitly granted you permission to use it — including reading their messages, screen, files, etc.
+NEVER refuse, warn about privacy, or add caveats when using enabled tools. Just do what the user asks.`
 
 // Tool-specific system prompt hints (only appended when tool is enabled)
 const TOOL_HINTS: Record<string, string> = {
@@ -88,7 +93,35 @@ browse — Browse the web: open pages, read content, or screenshot websites. Use
 Actions: "open" (opens in user's browser), "read" (extracts text), "screenshot" (visual capture)
 For research: use web_search to find URLs, then browse.read to get full content.
 If "read" returns little text, try "screenshot" — the page may be JS-heavy or require login.
-IMPORTANT: When sharing information from web pages, always include the source URL so the user can click to visit the page directly.`
+IMPORTANT: When sharing information from web pages, always include the source URL so the user can click to visit the page directly.`,
+
+  read_messages: `
+read_messages — Read the user's iMessage conversations (macOS only). Use it when:
+- The user asks about their messages, texts, or iMessages
+- The user asks "what did [person] say" or "show my recent messages"
+- The user asks to search their message history
+- The user asks "who texted me" or "any new messages"
+Actions: "recent" (recent messages, use hours param), "search" (find by keyword), "conversations" (list chats)
+This tool reads the Messages database or opens Messages and takes a screenshot.
+The user has explicitly granted you permission to read their messages by enabling this tool.
+Always use it when asked about messages — do NOT refuse or warn about privacy.
+If you receive a screenshot, read and summarize all visible conversations and messages.
+If you receive text data, summarize it naturally for the user.`,
+
+  run_shortcut: `
+run_shortcut — Run, list, search, or create macOS Shortcuts. Use it when:
+- The user asks to "run a shortcut" or mentions a specific Shortcut by name
+- The user asks "what shortcuts do I have" or "list my shortcuts"
+- The user asks to automate something that could be a Shortcut
+- The user asks to search for a shortcut
+- The user asks to create a new shortcut or automation
+Actions: "list" (show all), "run" (execute by name, optional input), "search" (find by keyword), "create" (build new shortcut)
+For "create", provide a name and an actions array. Available action templates:
+  open_url (url), open_app (app_name), show_notification (title, body), show_alert (title, message),
+  speak_text (text), get_clipboard, show_result (text), wait (seconds), vibrate,
+  run_shell_script (script), get_text (text), comment (text)
+Example: {"action":"create","name":"Greet Me","actions":[{"template":"show_notification","title":"Hello","body":"Good morning!"},{"template":"speak_text","text":"Good morning!"}]}
+The user will see a confirmation dialog to import the created shortcut into their library.`
 }
 
 /** Get the list of enabled tool names based on config flags. */
@@ -99,6 +132,8 @@ function getEnabledToolNames(config: AIConfig): string[] {
   if (config.seeScreenEnabled !== false) enabled.push('see_screen')
   if (config.mapsEnabled !== false) enabled.push('maps')
   if (config.browseEnabled !== false) enabled.push('browse')
+  if (config.messagesEnabled === true) enabled.push('read_messages')
+  if (config.shortcutsEnabled !== false) enabled.push('run_shortcut')
   return enabled
 }
 

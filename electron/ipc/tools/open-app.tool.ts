@@ -159,26 +159,34 @@ async function isAppRunningMac(appName: string): Promise<boolean> {
 }
 
 async function openAppMac(appName: string): Promise<string> {
-  // If already running, just bring to front
-  if (await isAppRunningMac(appName)) {
-    await execAsync(
-      `osascript -e 'tell application "${appName.replace(/"/g, '\\"')}" to activate'`
-    )
-    return `"${appName}" is already running — brought it to the front.`
-  }
+  const escaped = appName.replace(/"/g, '\\"')
 
-  // Not running — launch it
+  // Use a combined AppleScript: activate + reopen to launch & bring to front.
+  // Then use System Events to set frontmost. Multiple -e flags avoid quoting issues.
   try {
-    await execAsync(`open -a "${appName.replace(/"/g, '\\"')}"`)
-    return `Opened "${appName}" successfully.`
+    await execAsync(
+      `osascript` +
+      ` -e 'tell application "${escaped}" to activate'` +
+      ` -e 'tell application "${escaped}" to reopen'` +
+      ` -e 'delay 0.3'` +
+      ` -e 'tell application "System Events" to set frontmost of process "${escaped}" to true'`,
+      { timeout: 8000 }
+    )
+    return `Opened "${appName}" (brought to front).`
   } catch {
-    // open -a failed, try finding the full path
-    const appPath = await findAppMac(appName)
-    if (appPath) {
-      await execAsync(`open "${appPath.replace(/"/g, '\\"')}"`)
+    // osascript failed — app might not be installed or name doesn't match process.
+    // Fall back to open -a which handles app bundles by display name.
+    try {
+      await execAsync(`open -a "${escaped}"`)
       return `Opened "${appName}" successfully.`
+    } catch {
+      const appPath = await findAppMac(appName)
+      if (appPath) {
+        await execAsync(`open "${appPath.replace(/"/g, '\\"')}"`)
+        return `Opened "${appName}" successfully.`
+      }
+      throw new Error('not_found')
     }
-    throw new Error('not_found')
   }
 }
 

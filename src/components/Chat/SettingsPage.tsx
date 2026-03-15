@@ -39,7 +39,9 @@ export function SettingsPage() {
     seeScreenEnabled: aiConfig.seeScreenEnabled ?? true,
     mapsEnabled: aiConfig.mapsEnabled ?? true,
     mapsProvider: aiConfig.mapsProvider || 'auto',
-    browseEnabled: aiConfig.browseEnabled ?? true
+    browseEnabled: aiConfig.browseEnabled ?? true,
+    messagesEnabled: aiConfig.messagesEnabled ?? false,
+    shortcutsEnabled: aiConfig.shortcutsEnabled ?? true
   })
   const [saved, setSaved] = useState(false)
 
@@ -263,6 +265,54 @@ export function SettingsPage() {
               />
             </label>
           </div>
+        </div>
+
+        {/* Read Messages */}
+        <div className={styles.toolItem}>
+          <div className={styles.field}>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>Read Messages</span>
+                <span className={styles.toolDesc}>Read your iMessage conversations (macOS only)</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.messagesEnabled}
+                onChange={(e) => setLocal({ ...local, messagesEnabled: e.target.checked })}
+              />
+            </label>
+          </div>
+          {local.messagesEnabled && (
+            <div className={styles.toolSettings}>
+              <span className={styles.hint}>
+                Requires Full Disk Access: System Settings &gt; Privacy &amp; Security &gt; Full Disk Access &gt; enable MiniClaws
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Run Shortcuts */}
+        <div className={styles.toolItem}>
+          <div className={styles.field}>
+            <label className={styles.toggleRow}>
+              <div>
+                <span className={styles.toolName}>Shortcuts</span>
+                <span className={styles.toolDesc}>Run macOS Shortcuts automations (macOS only)</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={local.shortcutsEnabled}
+                onChange={(e) => setLocal({ ...local, shortcutsEnabled: e.target.checked })}
+              />
+            </label>
+          </div>
+          {local.shortcutsEnabled && (
+            <div className={styles.toolSettings}>
+              <span className={styles.hint}>
+                Run existing Shortcuts from the macOS Shortcuts app. Can list, search, and execute shortcuts by name.
+              </span>
+            </div>
+          )}
         </div>
       </section>
 

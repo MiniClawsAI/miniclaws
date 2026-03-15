@@ -58,6 +58,8 @@ export const useStore = create<CompanionStore>()(
         mapsEnabled: true,
         mapsProvider: 'auto',
         browseEnabled: true,
+        messagesEnabled: false,
+        shortcutsEnabled: true,
         tavilyApiKey: ''
       },
       setAIConfig: (config) =>
