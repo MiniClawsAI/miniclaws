@@ -279,6 +279,17 @@ function openSettingsWindow(): void {
   // Remove menu bar on Windows/Linux
   settingsWindow.setMenuBarVisibility(false)
 
+  // Enable right-click context menu (copy/paste) for input fields
+  settingsWindow.webContents.on('context-menu', (_e, params) => {
+    Menu.buildFromTemplate([
+      { role: 'cut', enabled: params.editFlags.canCut },
+      { role: 'copy', enabled: params.editFlags.canCopy },
+      { role: 'paste', enabled: params.editFlags.canPaste },
+      { type: 'separator' },
+      { role: 'selectAll', enabled: params.editFlags.canSelectAll }
+    ]).popup({ window: settingsWindow! })
+  })
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     settingsWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?page=settings`)
   } else {
