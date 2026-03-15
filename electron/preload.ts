@@ -83,6 +83,11 @@ contextBridge.exposeInMainWorld('electron', {
     const handler = (_: unknown, ctx: string) => cb(ctx)
     ipcRenderer.on('ai:tool_context', handler)
     return () => ipcRenderer.removeListener('ai:tool_context', handler)
+  },
+  onFocusChatInput: (cb: () => void) => {
+    const handler = () => cb()
+    ipcRenderer.on('focus-chat-input', handler)
+    return () => ipcRenderer.removeListener('focus-chat-input', handler)
   }
 })
 
@@ -109,6 +114,7 @@ declare global {
       useCharacter: (path: string) => void
       onUseCharacter: (cb: (path: string) => void) => () => void
       onToolContext: (cb: (ctx: string) => void) => () => void
+      onFocusChatInput: (cb: () => void) => () => void
     }
   }
 }

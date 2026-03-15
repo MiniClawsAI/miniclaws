@@ -51,6 +51,13 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     return () => window.removeEventListener('miniclaws:focus-input', handler)
   }, [])
 
+  // Focus input via global keyboard shortcut (Cmd+Shift+Space)
+  useEffect(() => {
+    return window.electron.onFocusChatInput(() => {
+      window.dispatchEvent(new Event('miniclaws:focus-input'))
+    })
+  }, [])
+
   const needsSetup = useCallback(() => {
     const needsKey = aiConfig.provider !== 'ollama'
     return needsKey && !aiConfig.apiKey?.trim()

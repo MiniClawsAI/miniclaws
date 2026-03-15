@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, nativeImage, dialog, protocol, net } from 'electron'
+import { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, nativeImage, dialog, protocol, net, globalShortcut } from 'electron'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
 import { is } from '@electron-toolkit/utils'
@@ -394,6 +394,14 @@ app.whenReady().then(() => {
   setMainWindow(mainWindow)
   createTray()
 
+  // Global shortcut: Cmd+Shift+M (macOS) / Ctrl+Shift+M (Win/Linux)
+  globalShortcut.register('CommandOrControl+Shift+M', () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return
+    mainWindow.show()
+    mainWindow.focus()
+    mainWindow.webContents.send('focus-chat-input')
+  })
+
   app.on('activate', () => {
     if (mainWindow && !mainWindow.isVisible()) {
       restoreWindow()
@@ -401,6 +409,10 @@ app.whenReady().then(() => {
       createWindow()
     }
   })
+})
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
 })
 
 app.on('window-all-closed', () => {
