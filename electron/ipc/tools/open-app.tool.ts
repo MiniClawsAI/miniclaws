@@ -25,6 +25,9 @@ const APP_ALIASES: Record<string, Record<string, string>> = {
     mail: 'Mail',
     notes: 'Notes',
     calendar: 'Calendar',
+    camera: 'Photo Booth',
+    webcam: 'Photo Booth',
+    'photo booth': 'Photo Booth',
     photos: 'Photos',
     music: 'Music',
     maps: 'Maps',
@@ -70,6 +73,8 @@ const APP_ALIASES: Record<string, Record<string, string>> = {
     steam: 'Steam'
   },
   win32: {
+    camera: 'microsoft.windows.camera:',
+    webcam: 'microsoft.windows.camera:',
     chrome: 'chrome',
     firefox: 'firefox',
     code: 'code',
@@ -90,6 +95,8 @@ const APP_ALIASES: Record<string, Record<string, string>> = {
     teams: 'teams'
   },
   linux: {
+    camera: 'cheese',
+    webcam: 'cheese',
     chrome: 'google-chrome',
     firefox: 'firefox',
     code: 'code',
@@ -120,14 +127,7 @@ const MAC_APP_STORE: Record<string, string> = {
 
 async function findAppMac(appName: string): Promise<string | null> {
   try {
-    // mdfind is the fastest way to find apps via Spotlight index
-    const { stdout } = await execAsync(
-      `mdfind "kMDItemKind == 'Application'" -name "${appName.replace(/"/g, '\\"')}" 2>/dev/null`
-    )
-    const matches = stdout.trim().split('\n').filter(Boolean)
-    if (matches.length > 0) return matches[0]
-
-    // Fallback: direct path check for common locations
+    // Direct path check first — most reliable
     const paths = [
       `/Applications/${appName}.app`,
       `/System/Applications/${appName}.app`,
@@ -141,7 +141,19 @@ async function findAppMac(appName: string): Promise<string | null> {
         /* not found */
       }
     }
-    return null
+
+    // mdfind as fallback — but only accept close matches to avoid opening wrong apps
+    const { stdout } = await execAsync(
+      `mdfind "kMDItemKind == 'Application'" -name "${appName.replace(/"/g, '\\"')}" 2>/dev/null`
+    )
+    const matches = stdout.trim().split('\n').filter(Boolean)
+    const lower = appName.toLowerCase()
+    // Only return a match if the app bundle name actually contains the search term
+    const exactish = matches.find((p) => {
+      const bundleName = p.match(/([^/]+)\.app$/)?.[1]?.toLowerCase() || ''
+      return bundleName.includes(lower) || lower.includes(bundleName)
+    })
+    return exactish || null
   } catch {
     return null
   }
@@ -308,7 +320,9 @@ export const openAppTool: RegisteredTool = {
   description:
     'Open an application on the user\'s computer by name. Can also search for installed apps. ' +
     'Use action "open" to launch an app, or "search" to list matching installed apps. ' +
-    'If the app is not found, returns install suggestions the user can follow.',
+    'If the app is not found, returns similar apps so you can ask the user which one they meant. ' +
+    'IMPORTANT: If the user asks for a generic term like "camera", "browser", or "editor", ' +
+    'and you are not sure which specific app they mean, ask them to clarify before calling this tool.',
 
   inputSchema: {
     type: 'object',
