@@ -57,8 +57,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
   // Focus input via global keyboard shortcut (Ctrl+Shift+M)
   useEffect(() => {
     return window.electron.onFocusChatInput(() => {
-      // Open chat panel if hidden, then focus input
-      useStore.getState().setChatOpen(true)
+      // Just focus input — don't open the thread history
       window.dispatchEvent(new Event('miniclaws:focus-input'))
     })
   }, [])
