@@ -421,31 +421,28 @@ app.whenReady().then(() => {
   globalShortcut.register('CommandOrControl+Shift+M', () => {
     if (!mainWindow || mainWindow.isDestroyed()) return
 
-    // 1. Suppress UI elements so nothing blinks
-    mainWindow.webContents.send('suppress-hover', true)
+    const needsRestore = mainWindow.isMinimized() || !mainWindow.isVisible()
 
-    // 2. Restore window if not visible
-    if (mainWindow.isMinimized()) {
+    if (needsRestore) {
+      // Set opacity 0 before restoring so nothing flashes
       mainWindow.setOpacity(0)
-      mainWindow.restore()
-    }
-    if (!mainWindow.isVisible()) {
-      mainWindow.setOpacity(0)
-      mainWindow.show()
-    }
-    mainWindow.setAlwaysOnTop(true, 'screen-saver')
-    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-    if (process.platform === 'darwin') app.dock?.hide()
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      if (!mainWindow.isVisible()) mainWindow.show()
+      mainWindow.setAlwaysOnTop(true, 'screen-saver')
+      mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      if (process.platform === 'darwin') app.dock?.hide()
 
-    // 3. Fade in, then focus input (keep hover suppressed briefly)
-    fadeWindow(mainWindow, mainWindow.getOpacity(), 1, 250, () => {
-      mainWindow?.webContents.focus()
-      mainWindow?.webContents.send('focus-chat-input')
-      // Delay unsuppress so hover UI doesn't flash from cursor position
-      setTimeout(() => {
-        mainWindow?.webContents.send('suppress-hover', false)
-      }, 150)
-    })
+      // Fade in naturally — hover UI will appear if cursor is over window
+      fadeWindow(mainWindow, 0, 1, 250, () => {
+        mainWindow?.webContents.focus()
+        mainWindow?.webContents.send('focus-chat-input')
+      })
+    } else {
+      // Already visible — just focus input
+      mainWindow.setAlwaysOnTop(true, 'screen-saver')
+      mainWindow.webContents.focus()
+      mainWindow.webContents.send('focus-chat-input')
+    }
   })
 
   app.on('activate', () => {
