@@ -58,6 +58,7 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
   // Main process delays IPC until window fade is complete, so we can act immediately
   useEffect(() => {
     return window.electron.onFocusChatInput(() => {
+      window.dispatchEvent(new Event('miniclaws:instant-hover'))
       window.dispatchEvent(new Event('miniclaws:input-focus'))
       inputRef.current?.focus()
       inputRef.current?.select()

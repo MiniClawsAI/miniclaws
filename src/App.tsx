@@ -10,9 +10,20 @@ export default function App() {
   const { isChatOpen: threadOpen, setChatOpen: setThreadOpen } = useStore()
   const [suppressHover, setSuppressHover] = useState(false)
   const [inputFocused, setInputFocused] = useState(false)
+  const [instantHover, setInstantHover] = useState(false)
 
   useEffect(() => {
     return window.electron.onSuppressHover(setSuppressHover)
+  }, [])
+
+  // Skip hover delay when restoring via shortcut
+  useEffect(() => {
+    const handler = () => {
+      setInstantHover(true)
+      setTimeout(() => setInstantHover(false), 500)
+    }
+    window.addEventListener('miniclaws:instant-hover', handler)
+    return () => window.removeEventListener('miniclaws:instant-hover', handler)
   }, [])
 
   // Keep chat visible when input is focused
@@ -81,7 +92,7 @@ export default function App() {
 
   return (
     <div
-      className={`${styles.root} ${suppressHover ? styles.suppressHover : ''} ${(threadOpen || inputFocused) ? styles.chatPinned : ''}`}
+      className={`${styles.root} ${suppressHover ? styles.suppressHover : ''} ${(threadOpen || inputFocused) ? styles.chatPinned : ''} ${instantHover ? styles.instantHover : ''}`}
       onMouseEnter={() => window.electron.setIgnoreMouse(false)}
       onMouseLeave={() => window.electron.setIgnoreMouse(true)}
     >

@@ -112,3 +112,9 @@
 .suppressHover .pickerBtn,
 .suppressHover .minimizeBtn { opacity: 0 !important; pointer-events: none; transition-delay: 0s; }
 
+/* Skip hover transition delay when restoring via shortcut */
+.instantHover:hover .chatWrap,
+.instantHover:hover .settingsBtn,
+.instantHover:hover .pickerBtn,
+.instantHover:hover .minimizeBtn { transition-delay: 0s !important; }
+
