@@ -55,15 +55,12 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
   }, [])
 
   // Focus input via global keyboard shortcut (Ctrl+Shift+M)
+  // Main process delays IPC until window fade is complete, so we can act immediately
   useEffect(() => {
     return window.electron.onFocusChatInput(() => {
-      // Make chat wrap visible immediately via inputFocused → chatPinned
       window.dispatchEvent(new Event('miniclaws:input-focus'))
-      // Delay focus to ensure window is ready and element is visible
-      setTimeout(() => {
-        inputRef.current?.focus()
-        inputRef.current?.select()
-      }, 100)
+      inputRef.current?.focus()
+      inputRef.current?.select()
     })
   }, [])
 

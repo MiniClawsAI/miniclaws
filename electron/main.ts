@@ -219,14 +219,23 @@ function createWindow(): void {
 
 function restoreWindow(): void {
   if (!mainWindow) return
-  if (mainWindow.isMinimized()) mainWindow.restore()
-  if (mainWindow.isVisible()) {
+  const wasMinimized = mainWindow.isMinimized()
+  const wasVisible = mainWindow.isVisible()
+
+  if (wasMinimized) {
+    // Hide opacity before restore to prevent flash
+    mainWindow.setOpacity(0)
+    mainWindow.restore()
+  }
+
+  if (wasVisible && !wasMinimized) {
     // Already visible — just make sure it's on top
     mainWindow.setAlwaysOnTop(true, 'screen-saver')
     mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     if (process.platform === 'darwin') app.dock?.hide()
     return
   }
+
   mainWindow.setOpacity(0)
   mainWindow.webContents.send('suppress-hover', true)
   mainWindow.show()
