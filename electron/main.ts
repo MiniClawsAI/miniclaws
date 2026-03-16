@@ -412,7 +412,12 @@ app.whenReady().then(() => {
   globalShortcut.register('CommandOrControl+Shift+M', () => {
     if (!mainWindow || mainWindow.isDestroyed()) return
     restoreWindow()
-    mainWindow.webContents.send('focus-chat-input')
+    // Ensure webContents has focus, then send IPC after window is ready
+    mainWindow.focusOnWebView()
+    setTimeout(() => {
+      mainWindow?.webContents.focus()
+      mainWindow?.webContents.send('focus-chat-input')
+    }, 300)
   })
 
   app.on('activate', () => {
