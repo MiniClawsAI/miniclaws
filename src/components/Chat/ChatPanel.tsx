@@ -54,11 +54,26 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
     return () => window.removeEventListener('miniclaws:focus-input', handler)
   }, [])
 
-  // Focus input via global keyboard shortcut (Cmd+Shift+Space)
+  // Focus input via global keyboard shortcut (Ctrl+Shift+M)
   useEffect(() => {
     return window.electron.onFocusChatInput(() => {
+      // Open chat panel if hidden, then focus input
+      useStore.getState().setChatOpen(true)
       window.dispatchEvent(new Event('miniclaws:focus-input'))
     })
+  }, [])
+
+  // ESC key: blur input, hide chat panel and menus
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        inputRef.current?.blur()
+        useStore.getState().setChatOpen(false)
+        window.dispatchEvent(new Event('miniclaws:input-blur'))
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
   }, [])
 
   const needsSetup = useCallback(() => {
