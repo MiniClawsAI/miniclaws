@@ -57,8 +57,13 @@ export function ChatPanel({ threadOpen, onToggleThread }: ChatPanelProps) {
   // Focus input via global keyboard shortcut (Ctrl+Shift+M)
   useEffect(() => {
     return window.electron.onFocusChatInput(() => {
-      // Just focus input — don't open the thread history
-      window.dispatchEvent(new Event('miniclaws:focus-input'))
+      // Make chat wrap visible immediately via inputFocused → chatPinned
+      window.dispatchEvent(new Event('miniclaws:input-focus'))
+      // Delay focus to ensure window is ready and element is visible
+      setTimeout(() => {
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      }, 100)
     })
   }, [])
 
