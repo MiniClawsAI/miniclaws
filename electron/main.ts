@@ -437,11 +437,14 @@ app.whenReady().then(() => {
     mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     if (process.platform === 'darwin') app.dock?.hide()
 
-    // 3. Fade in, then unsuppress and focus input
+    // 3. Fade in, then focus input (keep hover suppressed briefly)
     fadeWindow(mainWindow, mainWindow.getOpacity(), 1, 250, () => {
-      mainWindow?.webContents.send('suppress-hover', false)
       mainWindow?.webContents.focus()
       mainWindow?.webContents.send('focus-chat-input')
+      // Delay unsuppress so hover UI doesn't flash from cursor position
+      setTimeout(() => {
+        mainWindow?.webContents.send('suppress-hover', false)
+      }, 150)
     })
   })
 
