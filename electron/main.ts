@@ -420,13 +420,29 @@ app.whenReady().then(() => {
   // Global shortcut: Cmd+Shift+M (macOS) / Ctrl+Shift+M (Win/Linux)
   globalShortcut.register('CommandOrControl+Shift+M', () => {
     if (!mainWindow || mainWindow.isDestroyed()) return
-    restoreWindow()
-    // Ensure webContents has focus, then send IPC after window is ready
-    mainWindow.focusOnWebView()
-    setTimeout(() => {
+
+    // 1. Suppress UI elements so nothing blinks
+    mainWindow.webContents.send('suppress-hover', true)
+
+    // 2. Restore window if not visible
+    if (mainWindow.isMinimized()) {
+      mainWindow.setOpacity(0)
+      mainWindow.restore()
+    }
+    if (!mainWindow.isVisible()) {
+      mainWindow.setOpacity(0)
+      mainWindow.show()
+    }
+    mainWindow.setAlwaysOnTop(true, 'screen-saver')
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    if (process.platform === 'darwin') app.dock?.hide()
+
+    // 3. Fade in, then unsuppress and focus input
+    fadeWindow(mainWindow, mainWindow.getOpacity(), 1, 250, () => {
+      mainWindow?.webContents.send('suppress-hover', false)
       mainWindow?.webContents.focus()
       mainWindow?.webContents.send('focus-chat-input')
-    }, 300)
+    })
   })
 
   app.on('activate', () => {
