@@ -219,9 +219,19 @@ function createWindow(): void {
 
 function restoreWindow(): void {
   if (!mainWindow) return
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  if (mainWindow.isVisible()) {
+    // Already visible — just make sure it's on top
+    mainWindow.setAlwaysOnTop(true, 'screen-saver')
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    if (process.platform === 'darwin') app.dock?.hide()
+    return
+  }
   mainWindow.setOpacity(0)
   mainWindow.webContents.send('suppress-hover', true)
   mainWindow.show()
+  mainWindow.setAlwaysOnTop(true, 'screen-saver')
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   if (process.platform === 'darwin') app.dock?.hide()
   fadeWindow(mainWindow, 0, 1, 250, () => {
     mainWindow?.webContents.send('suppress-hover', false)
@@ -401,11 +411,7 @@ app.whenReady().then(() => {
   // Global shortcut: Cmd+Shift+M (macOS) / Ctrl+Shift+M (Win/Linux)
   globalShortcut.register('CommandOrControl+Shift+M', () => {
     if (!mainWindow || mainWindow.isDestroyed()) return
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.show()
-    mainWindow.focus()
-    mainWindow.setAlwaysOnTop(true)
-    mainWindow.setAlwaysOnTop(false)
+    restoreWindow()
     mainWindow.webContents.send('focus-chat-input')
   })
 
