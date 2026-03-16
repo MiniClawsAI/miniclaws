@@ -401,8 +401,11 @@ app.whenReady().then(() => {
   // Global shortcut: Cmd+Shift+M (macOS) / Ctrl+Shift+M (Win/Linux)
   globalShortcut.register('CommandOrControl+Shift+M', () => {
     if (!mainWindow || mainWindow.isDestroyed()) return
+    if (mainWindow.isMinimized()) mainWindow.restore()
     mainWindow.show()
     mainWindow.focus()
+    mainWindow.setAlwaysOnTop(true)
+    mainWindow.setAlwaysOnTop(false)
     mainWindow.webContents.send('focus-chat-input')
   })
 
